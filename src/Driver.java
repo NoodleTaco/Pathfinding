@@ -2,6 +2,7 @@ import java.util.Random;
 public class Driver {
     public static void main(String[] args) throws Exception {
         // TO DO: Try making basic custom class for the ship that details whether a spot is open, closed, has one open neighbor, or 2 or more
+        // TO DO: Figure out dead end mechanism 
         int shipEdgeLength;
         Random rand = new Random();
 
