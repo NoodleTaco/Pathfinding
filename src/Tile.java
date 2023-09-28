@@ -1,14 +1,14 @@
 public class Tile {
     private boolean isOpen;
-    private boolean isClosed;
     private boolean isNeighbor;
     private boolean tooManyNeighbors;
     private boolean isDeadEnd;
+    private int row;
+    private int col;
 
     public Tile ()
     {
         isOpen = false;
-        isClosed = true;
         isNeighbor = false;
         tooManyNeighbors = false;
         isDeadEnd = false;
@@ -19,10 +19,7 @@ public class Tile {
         return isOpen;
     }
 
-    public boolean getClosed()
-    {
-        return isClosed;
-    }
+
     public boolean getIsNeighbor()
     {
         return isNeighbor;
@@ -36,10 +33,9 @@ public class Tile {
         return isDeadEnd;
     }
 
-    public void setOpen()
+    public void setOpen(boolean open)
     {
-        isOpen = true;
-        isClosed = false;
+        isOpen = open;
     }
 
     public void setTooManyNeighbors()
@@ -51,4 +47,49 @@ public class Tile {
     {
         isNeighbor = true;
     }
+
+    public void setIsDeadEnd(boolean deadEnd)
+    {
+        isDeadEnd = deadEnd;
+    }
+
+    public void setRow(int row)
+    {
+        this.row = row;
+    }
+    public void setCol(int col)
+    {
+        this.col = col;
+    }
+    public int getRow()
+    {
+        return row;
+    }
+    public int getCol()
+    {
+        return col;
+    }
+
+    @Override
+    public boolean equals(Object obj)
+    {
+        if (obj == null) {
+            return false;
+        }
+
+        if (obj.getClass() != this.getClass()) {
+            return false;
+        }
+
+        final Tile other = (Tile)obj;
+        if(this.getRow() == other.getRow() && this.getCol() == other.getCol())
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
+
 }

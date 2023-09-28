@@ -4,13 +4,15 @@ public class Ship {
 
     private Tile[][] ship;
     private int shipEdgeLength;
-    private ArrayList<Coordinate> neighbors;
+    private ArrayList<Tile> neighbors;
+    private ArrayList<Tile> deadEnds;
 
     public Ship()
     {
-        this.shipEdgeLength = 10;
-        ship = new Tile[10][10];
-        neighbors = new ArrayList<Coordinate>();
+        this.shipEdgeLength = 100;
+        ship = new Tile[100][100];
+        neighbors = new ArrayList<Tile>();
+        deadEnds = new ArrayList<Tile>();
     }
 
     public Ship(int shipEdgeLength)
@@ -26,6 +28,8 @@ public class Ship {
             for (int col = 0; col < shipEdgeLength; col++)
             {
                 ship[row][col] = new Tile();
+                ship[row][col].setRow(row);
+                ship[row][col].setCol(col);
             }
         }
 
@@ -35,74 +39,77 @@ public class Ship {
 
         int xStart = rand.nextInt(shipEdgeLength);
         int yStart = rand.nextInt(shipEdgeLength);
-        ship[xStart][yStart].setOpen();
-        checkNeighbors(xStart, yStart);
+        ship[xStart][yStart].setOpen(true);
+        checkNeighbors(ship[xStart][yStart]);
 
         while(!neighbors.isEmpty())
         {
             int randNeighbor = rand.nextInt(neighbors.size());
-            if (!ship[neighbors.get(randNeighbor).getXCoordinate()][neighbors.get(randNeighbor).getYCoordinate()].getTooManyNeighbors())
+            if (!ship[neighbors.get(randNeighbor).getRow()][neighbors.get(randNeighbor).getCol()].getTooManyNeighbors())
             {
-                ship[neighbors.get(randNeighbor).getXCoordinate()][neighbors.get(randNeighbor).getYCoordinate()].setOpen();
-                checkNeighbors(neighbors.get(randNeighbor).getXCoordinate(), neighbors.get(randNeighbor).getYCoordinate());
+                ship[neighbors.get(randNeighbor).getRow()][neighbors.get(randNeighbor).getCol()].setOpen(true);
+                checkNeighbors(ship[neighbors.get(randNeighbor).getRow()][neighbors.get(randNeighbor).getCol()]);
             }
             neighbors.remove(randNeighbor);
         }
+        createDeadEnds();
 
+
+        
     }
 
-    private void checkNeighbors(int row, int col)
+    private void checkNeighbors(Tile tile)
     {
-        if(row + 1 < shipEdgeLength && !ship[row][col].getTooManyNeighbors())
+        if(tile.getRow() + 1 < shipEdgeLength && !ship[tile.getRow()][tile.getCol()].getTooManyNeighbors())
         {
-            if(ship[row +1][col].getIsNeighbor())
+            if(ship[tile.getRow() +1][tile.getCol()].getIsNeighbor())
             {
-                ship[row +1][col].setTooManyNeighbors();
+                ship[tile.getRow() +1][tile.getCol()].setTooManyNeighbors();
             }
-            else if(!ship[row +1][col].getOpen())
+            else if(!ship[tile.getRow() +1][tile.getCol()].getOpen())
             {
-                ship[row +1][col].setIsNeighbor();
-                neighbors.add(new Coordinate(row +1, col));
+                ship[tile.getRow() +1][tile.getCol()].setIsNeighbor();
+                neighbors.add(ship[tile.getRow() +1][tile.getCol()]);
             }
             
         }
 
-        if(row -1 > -1 && !ship[row][col].getTooManyNeighbors())
+        if(tile.getRow() -1 > -1 && !ship[tile.getRow()][tile.getCol()].getTooManyNeighbors())
         {
-            if(ship[row -1][col].getIsNeighbor())
+            if(ship[tile.getRow() -1][tile.getCol()].getIsNeighbor())
             {
-                ship[row -1][col].setTooManyNeighbors();
+                ship[tile.getRow() -1][tile.getCol()].setTooManyNeighbors();
             }
-            else if(!ship[row -1][col].getOpen())
+            else if(!ship[tile.getRow() -1][tile.getCol()].getOpen())
             {
-                ship[row -1][col].setIsNeighbor();
-                neighbors.add(new Coordinate(row -1, col));
+                ship[tile.getRow() -1][tile.getCol()].setIsNeighbor();
+                neighbors.add(ship[tile.getRow() -1][tile.getCol()]);
             }
         }
         
-        if(col -1 > -1 && !ship[row][col].getTooManyNeighbors())
+        if(tile.getCol() -1 > -1 && !ship[tile.getRow()][tile.getCol()].getTooManyNeighbors())
         {
-            if(ship[row][col -1].getIsNeighbor())
+            if(ship[tile.getRow()][tile.getCol() -1].getIsNeighbor())
             {
-                ship[row][col -1].setTooManyNeighbors();
+                ship[tile.getRow()][tile.getCol() -1].setTooManyNeighbors();
             }
-            else if(!ship[row][col -1].getOpen())
+            else if(!ship[tile.getRow()][tile.getCol() -1].getOpen())
             {
-                ship[row][col -1].setIsNeighbor();
-                neighbors.add(new Coordinate(row , col -1));
+                ship[tile.getRow()][tile.getCol() -1].setIsNeighbor();
+                neighbors.add(ship[tile.getRow()][tile.getCol() -1]);
             }
         }
 
-        if(col +1 < shipEdgeLength && !ship[row][col].getTooManyNeighbors())
+        if(tile.getCol() +1 < shipEdgeLength && !ship[tile.getRow()][tile.getCol()].getTooManyNeighbors())
         {
-            if(ship[row][col +1].getIsNeighbor())
+            if(ship[tile.getRow()][tile.getCol() +1].getIsNeighbor())
             {
-                ship[row][col +1].setTooManyNeighbors();
+                ship[tile.getRow()][tile.getCol() +1].setTooManyNeighbors();
             }
-            else if(!ship[row][col +1].getOpen())
+            else if(!ship[tile.getRow()][tile.getCol() +1].getOpen())
             {
-                ship[row][col +1].setIsNeighbor();
-                neighbors.add(new Coordinate(row , col +1));
+                ship[tile.getRow()][tile.getCol() +1].setIsNeighbor();
+                neighbors.add(ship[tile.getRow()][tile.getCol() +1]);
             }
         }
     }
@@ -117,9 +124,17 @@ public class Ship {
         {
             for (int col = 0; col < shipEdgeLength; col++)
             {
+                
                 if(ship[row][col].getOpen())
                 {
-                    System.out.print("O ");
+                    if(ship[row][col].getIsDeadEnd())
+                    {
+                        System.out.print("D ");
+                    }
+                    else
+                    {
+                        System.out.print("O ");
+                    }
                 }
 
                 else if(ship[row][col].getTooManyNeighbors())
@@ -132,7 +147,7 @@ public class Ship {
                     System.out.print("N ");
                 }
 
-                else if(ship[row][col].getClosed())
+                else if(!ship[row][col].getOpen())
                 {
                     System.out.print("C ");
                 }
@@ -145,9 +160,131 @@ public class Ship {
     {
         for(int i = 0; i < neighbors.size(); i++)
         {
-            neighbors.get(i).printCoordinate();
+            System.out.print(neighbors.get(i).getRow() + ", " + neighbors.get(i).getCol());
+            System.out.println();
         }
         
+    }
+
+    private void printDeadEndsList()
+    {
+        System.out.println("Number of Dead ends: " + deadEnds.size());
+        for(int i = 0; i < deadEnds.size(); i++)
+        {
+            System.out.print(deadEnds.get(i).getRow() + ", " + deadEnds.get(i).getCol());
+            System.out.println();
+        }
+    }
+
+    private void findDeadEnds()
+    {
+        for(int row = 0; row < shipEdgeLength; row++)
+        {
+            for (int col = 0; col < shipEdgeLength; col++)
+            {
+                isDeadEnd(row, col);
+            }
+        }
+        
+
+    }
+
+    private void isDeadEnd(int row, int col)
+    {
+        if((row < shipEdgeLength && row > -1 && col < shipEdgeLength && col > -1))
+        {
+            if(ship[row][col].getOpen())
+            {
+                int count = 0;
+                if(row + 1 < shipEdgeLength && ship[row +1][col].getOpen())
+                {
+                    count ++;
+                }
+
+                if(row - 1 > -1 && ship[row -1][col].getOpen())
+                {
+                    count ++;
+                }               
+                
+                if(col -1 > -1 && ship[row][col-1].getOpen())
+                {
+                    count ++;
+                }
+
+                if(col +1 < shipEdgeLength && ship[row][col+1].getOpen())
+                {
+                    count ++;
+                }           
+                if(count == 1)
+                {
+                    ship[row][col].setIsDeadEnd(true);
+                    if(!deadEnds.contains(ship[row][col]))
+                    {
+                        deadEnds.add(ship[row][col]);
+                    }
+                }
+                else
+                {
+                    ship[row][col].setIsDeadEnd(false);
+                    if(deadEnds.contains(ship[row][col]))
+                    {
+                        deadEnds.remove(ship[row][col]);
+                    }
+                }                
+            }
+
+
+        }
+
+
+    }
+
+    private void createDeadEnds()
+    {
+        findDeadEnds();
+
+        int startingDeadEnds = deadEnds.size();
+        System.out.println("Number of Starting Dead ends: " + startingDeadEnds);
+        Random rand = new Random();
+        
+        //for(int i = 0; i < 1; i++)
+        while(deadEnds.size() > startingDeadEnds/2)
+        {
+            Tile tile = deadEnds.get(rand.nextInt(deadEnds.size()));
+            ArrayList<Tile> deadEndNeighbors = new ArrayList<Tile>();
+            if(tile.getRow() + 1 < shipEdgeLength && !ship[tile.getRow() +1][tile.getCol()].getOpen())
+            {
+                deadEndNeighbors.add(ship[tile.getRow()+1][tile.getCol()]);
+            }
+
+            if(tile.getRow() - 1 > -1 && !ship[tile.getRow() -1][tile.getCol()].getOpen())
+            {
+                deadEndNeighbors.add(ship[tile.getRow()-1][tile.getCol()]);
+            }               
+            
+            if(tile.getCol() -1 > -1 && !ship[tile.getRow()][tile.getCol()-1].getOpen())
+            {
+                deadEndNeighbors.add(ship[tile.getRow()][tile.getCol()-1]);
+            }
+
+            if(tile.getCol() +1 < shipEdgeLength && !ship[tile.getRow()][tile.getCol()+1].getOpen())
+            {
+                deadEndNeighbors.add(ship[tile.getRow()][tile.getCol()+1]);
+            }
+
+            
+            int randTile = rand.nextInt(deadEndNeighbors.size());
+            rand.setSeed(16);
+            deadEndNeighbors.get(randTile).setOpen(true);
+            tile.setIsDeadEnd(false);
+            deadEnds.remove(tile);
+            isDeadEnd( deadEndNeighbors.get(randTile).getRow() +1,  deadEndNeighbors.get(randTile).getCol());
+            isDeadEnd( deadEndNeighbors.get(randTile).getRow() -1 , deadEndNeighbors.get(randTile).getCol());
+            isDeadEnd( deadEndNeighbors.get(randTile).getRow() , deadEndNeighbors.get(randTile).getCol() -1);
+            isDeadEnd( deadEndNeighbors.get(randTile).getRow() , deadEndNeighbors.get(randTile).getCol() +1);
+            //System.out.println("Tile Coords are "+ tile.getRow() + ", " + tile.getCol());
+            //System.out.println ("deadEndNeighbors size: " + deadEndNeighbors.size());
+        }
     }
 
     //testbed Main
@@ -155,8 +292,10 @@ public class Ship {
     {
         Ship ship = new Ship();
         ship.formShip();
+        System.out.println();
         ship.printShip();
-        ship.printNeighborsList();
+        ship.printDeadEndsList();
+
     }
     
 }
