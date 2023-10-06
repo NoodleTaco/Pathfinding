@@ -9,8 +9,8 @@ public class Ship {
 
     public Ship()
     {
-        this.shipEdgeLength = 100;
-        ship = new Tile[100][100];
+        this.shipEdgeLength = 10;
+        ship = new Tile[10][10];
         neighbors = new ArrayList<Tile>();
         deadEnds = new ArrayList<Tile>();
     }
@@ -21,7 +21,7 @@ public class Ship {
         ship = new Tile[shipEdgeLength][shipEdgeLength];
     }
 
-    private void formShip()
+    public void formShip()
     {
         for(int row = 0; row < shipEdgeLength; row++)
         {
@@ -118,7 +118,7 @@ public class Ship {
 
     
     //Prints a visual representation of the ship, used for testing. 
-    private void printShip()
+    public void printShip()
     {
         for(int row = 0; row < shipEdgeLength; row++)
         {
@@ -287,6 +287,19 @@ public class Ship {
         }
     }
 
+
+    public int getShipEdgeLength()
+    {
+        return shipEdgeLength;
+    }
+
+    public Tile getShipTile(int row, int col)
+    {
+        return ship[row][col];
+    }
+
+    
+
     //testbed Main
     public static void main(String[] args) throws Exception 
     {
@@ -294,7 +307,6 @@ public class Ship {
         ship.formShip();
         System.out.println();
         ship.printShip();
-        ship.printDeadEndsList();
 
     }
     

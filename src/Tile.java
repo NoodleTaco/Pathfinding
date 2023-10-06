@@ -91,5 +91,9 @@ public class Tile {
             return false;
         }
     }
+    @Override
+    public String toString() {
+        return "(" + this.row + " , " + this.col + ")";
+    }
 
 }
