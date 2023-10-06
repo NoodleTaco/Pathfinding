@@ -118,7 +118,7 @@ public class Ship {
 
     
     //Prints a visual representation of the ship, used for testing. 
-    public void printShip()
+    private void printShip()
     {
         for(int row = 0; row < shipEdgeLength; row++)
         {
@@ -297,6 +297,8 @@ public class Ship {
     {
         return ship[row][col];
     }
+
+    
 
     
 

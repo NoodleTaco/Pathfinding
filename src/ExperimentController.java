@@ -3,11 +3,11 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 import java.util.Random;
 import java.util.Set;
+import java.util.Iterator;
 
 public class ExperimentController {
 
@@ -23,12 +23,15 @@ public class ExperimentController {
 
     private ArrayList<Tile> botPath;
 
+    private double q;
+
     public ExperimentController()
     {
         ship = new Ship();
         fireTiles = new ArrayList<Tile>();
         botNeighbors = new ArrayList<Tile>();
         botPath = new ArrayList<Tile>();
+        q = 0.5;
     }
 
     /**
@@ -96,15 +99,15 @@ public class ExperimentController {
 
             if(curr.equals(button))
             {
-                System.out.println("Found it");
+                //System.out.println("Found it");
                 break;
             }
 
-            fillBotOneNeighbors(curr);
+            fillNeighbors(curr, botNeighbors);
 
             for(Tile tile : botNeighbors)
             {
-                if(!visited.contains(tile))
+                if(!visited.contains(tile) && !fireTiles.contains(tile))
                 {
                     queue.add(tile);
                     visited.add(tile);
@@ -129,9 +132,13 @@ public class ExperimentController {
             currentTile = parent.get(currentTile);
         }
 
-        System.out.println("Bot Path Size: " + botPath.size());
+        
 
         Collections.reverse(botPath);
+
+        botPath.remove(0);
+
+        System.out.println("Bot Path Size: " + botPath.size());
 
         System.out.print("Bot Path: ");
 
@@ -140,42 +147,191 @@ public class ExperimentController {
             System.out.print(tile.toString() + " ");
         }
 
+        System.out.println();
+
     }
 
     /**
-     * Adds open tiles adjacent to the tile parameter to the botNeighbors list avoiding the initial fire cell
+     * Adds open tiles adjacent to the list parameter
      * @param tile the tile whose neighbors are being considered
+     * @param list the list where tile objects are being added 
      */
-    private void fillBotOneNeighbors(Tile tile)
+    private void fillNeighbors(Tile tile, ArrayList<Tile> list)
     {
-        if(tile.getRow() + 1 < ship.getShipEdgeLength() && ship.getShipTile(tile.getRow() + 1, tile.getCol()).getOpen() && !fireTiles.contains(ship.getShipTile(tile.getRow() + 1, tile.getCol()))) 
+        if(tile.getRow() + 1 < ship.getShipEdgeLength() && ship.getShipTile(tile.getRow() + 1, tile.getCol()).getOpen() && !list.contains(ship.getShipTile(tile.getRow() + 1, tile.getCol()))) 
         {
-            botNeighbors.add(ship.getShipTile(tile.getRow() + 1, tile.getCol()));
+            list.add(ship.getShipTile(tile.getRow() + 1, tile.getCol()));
         }
 
-        if(tile.getRow() - 1 > -1 && ship.getShipTile(tile.getRow() - 1, tile.getCol()).getOpen() && !fireTiles.contains(ship.getShipTile(tile.getRow() - 1, tile.getCol())))
+        if(tile.getRow() - 1 > -1 && ship.getShipTile(tile.getRow() - 1, tile.getCol()).getOpen() && !list.contains(ship.getShipTile(tile.getRow() - 1, tile.getCol())))
         {
-            botNeighbors.add(ship.getShipTile(tile.getRow() - 1, tile.getCol()));
+            list.add(ship.getShipTile(tile.getRow() - 1, tile.getCol()));
         }
 
-        if(tile.getCol() + 1 < ship.getShipEdgeLength() && ship.getShipTile(tile.getRow() , tile.getCol() + 1).getOpen() && !fireTiles.contains(ship.getShipTile(tile.getRow() , tile.getCol() + 1)))
+        if(tile.getCol() + 1 < ship.getShipEdgeLength() && ship.getShipTile(tile.getRow() , tile.getCol() + 1).getOpen() && !list.contains(ship.getShipTile(tile.getRow() , tile.getCol() + 1)))
         {
-            botNeighbors.add(ship.getShipTile(tile.getRow(), tile.getCol() + 1));
+            list.add(ship.getShipTile(tile.getRow(), tile.getCol() + 1));
         }
 
-        if(tile.getCol() - 1 > -1 && ship.getShipTile(tile.getRow() , tile.getCol() -1).getOpen() && !fireTiles.contains(ship.getShipTile(tile.getRow() , tile.getCol() - 1)))
+        if(tile.getCol() - 1 > -1 && ship.getShipTile(tile.getRow() , tile.getCol() -1).getOpen() && !list.contains(ship.getShipTile(tile.getRow() , tile.getCol() - 1)))
         {
-            botNeighbors.add(ship.getShipTile(tile.getRow(), tile.getCol() -1));
+            list.add(ship.getShipTile(tile.getRow(), tile.getCol() -1));
         }
         
     }
+
 
     public void playBall()
 
     {
+        spawn();
+        runBotOne();
 
-        
+        printShip();
+
+
+        while(true)
+        {
+            if(fireTiles.contains(bot))
+            {
+                System.out.println("death");
+                return;
+            }
+
+            bot = botPath.remove(0);
+
+            if(bot.equals(button))
+            {
+                System.out.println("YIPPPEEEE");
+                return;
+            }
+
+            if(fireTiles.contains(bot))
+            {
+                System.out.println("death");
+                return;
+            }
+
+            fireSpread();
+
+            System.out.println();
+
+            printShip();
+        }
     }
+
+    private void fireSpread()
+    {
+        ArrayList<Tile> fireNeighbors = new ArrayList<Tile>();
+        Set<Tile> fireTilesToBeAdded = new HashSet<>();
+        
+
+        for(Tile tile: fireTiles)
+        {
+            fillNeighbors(tile, fireNeighbors);
+        }
+        
+        for(Tile tile: fireNeighbors)
+        {
+            if(!fireTiles.contains(tile))
+            {
+                double fireChance = 1 - Math.pow(1-q, numFireNeighbors(tile));
+
+                if(probabilityRoll(fireChance))
+                {
+                    fireTilesToBeAdded.add(tile);
+                }
+            }
+        }
+
+
+        if(!fireTilesToBeAdded.isEmpty())
+        {
+            Iterator<Tile> iterator = fireTilesToBeAdded.iterator(); 
+            while(iterator.hasNext())
+            {
+                fireTiles.add(iterator.next());
+            }
+        }
+
+
+    }
+
+    /**
+     * Gives the number of tiles on fire that neighbor a given tile
+     * @param tile tile being checked
+     * @return the number of fire tiles neighboring tile
+     */
+    private int numFireNeighbors(Tile tile )
+    {
+        int count = 0;
+        if(tile.getRow() + 1 < ship.getShipEdgeLength() && fireTiles.contains(ship.getShipTile(tile.getRow() + 1, tile.getCol()))) 
+        {
+            count ++;
+        }
+
+        if(tile.getRow() - 1 > -1 && fireTiles.contains(ship.getShipTile(tile.getRow() - 1, tile.getCol())))
+        {
+            count ++;
+        }
+
+        if(tile.getCol() + 1 < ship.getShipEdgeLength() && fireTiles.contains(ship.getShipTile(tile.getRow() , tile.getCol() + 1)))
+        {
+            count ++;
+        }
+
+        if(tile.getCol() - 1 > -1 && fireTiles.contains(ship.getShipTile(tile.getRow() , tile.getCol() - 1)))
+        {
+            count ++;
+        }
+        
+        return count;
+    }
+
+    public boolean probabilityRoll(double probability)
+    {
+        Random rand = new Random();
+        double randomValue = rand.nextDouble();         
+        return randomValue < probability;
+    }
+
+        //Prints a visual representation of the ship, used for testing. 
+        private void printShip()
+        {
+            for(int row = 0; row < ship.getShipEdgeLength(); row++)
+            {
+                for (int col = 0; col < ship.getShipEdgeLength(); col++)
+                {
+
+                    if(fireTiles.contains(ship.getShipTile(row, col)))
+                    {
+                        System.out.print("F ");
+                    }
+
+                    else if(bot.equals(ship.getShipTile(row, col)))
+                    {
+                        System.out.print("B ");
+                    }
+
+                    else if(button.equals(ship.getShipTile(row, col)))
+                    {
+                        System.out.print("G ");
+                    }
+
+                    else if(ship.getShipTile(row, col).getOpen())
+                    {
+                        System.out.print("O ");
+                    }
+
+                    else 
+                    {
+                        System.out.print("C ");
+                    }
+                }
+                System.out.println();
+            }
+        }
+    
 
     public Ship getShip()
     {
@@ -187,9 +343,7 @@ public class ExperimentController {
     public static void main(String[] args) throws Exception 
     {
         ExperimentController experimentController = new ExperimentController();
-        experimentController.spawn();
-        experimentController.getShip().printShip();
-        experimentController.runBotOne();
+        experimentController.playBall();
 
 
     }
