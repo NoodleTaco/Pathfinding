@@ -49,7 +49,6 @@ public class ExperimentController {
         ship.formShip();
 
         Random rand = new Random();
-        rand.setSeed(710);
 
         while(true)
         {
@@ -85,9 +84,11 @@ public class ExperimentController {
             }
         }
 
+
         System.out.println("Bot Starting Position: " + bot.toString());
         System.out.println("Button Starting Position: " + button.toString());
         System.out.println("Fire Starting Position: " + fireTiles.get(0).toString());
+
     }
     
     /**
@@ -151,6 +152,7 @@ public class ExperimentController {
 
         botPath.remove(0);
 
+
         System.out.println("Bot Path Size: " + botPath.size());
 
         System.out.print("Bot Path: ");
@@ -171,12 +173,22 @@ public class ExperimentController {
         Queue<Tile> queue = new LinkedList<>();
         Set<Tile> visited = new HashSet<>();
         Map<Tile, Tile> parent = new HashMap<>();
+        ArrayList<Tile> fireNeighbors = new ArrayList<Tile>();
 
         botPath.clear();
 
         queue.add(bot);
         visited.add(bot);
         parent.put(bot, null);
+
+        
+
+
+        for(Tile tile: fireTiles)
+        {
+            fillNeighbors(tile, fireNeighbors);
+        }
+        
 
         while(!queue.isEmpty())
         {
@@ -192,7 +204,7 @@ public class ExperimentController {
 
             for(Tile tile : botNeighbors)
             {
-                if(!visited.contains(tile) && !fireTiles.contains(tile))
+                if(!visited.contains(tile) && !fireTiles.contains(tile) && !fireNeighbors.contains(tile))
                 {
                     queue.add(tile);
                     visited.add(tile);
@@ -206,6 +218,7 @@ public class ExperimentController {
 
         if(!parent.containsKey(button))
         {
+            bfsAvoidFire();
             return;
         }
 
@@ -222,6 +235,7 @@ public class ExperimentController {
         Collections.reverse(botPath);
 
         botPath.remove(0);
+        /* 
 
         System.out.println("Bot Path Size: " + botPath.size());
 
@@ -233,11 +247,11 @@ public class ExperimentController {
         }
 
         System.out.println();
-
+        */
     }
 
     /**
-     * Adds open tiles adjacent to the list parameter
+     * Adds open tiles adjacent to a select tile to a list
      * @param tile the tile whose neighbors are being considered
      * @param list the list where tile objects are being added 
      */
@@ -268,13 +282,13 @@ public class ExperimentController {
 
     public int botOneExperiment()
     {
-        //System.out.println("**Bot 1 Experiment**");
+        System.out.println("**Bot 1 Experiment**");
 
         bfsAvoidFire();
 
         if(botPath.isEmpty())
         {
-            //System.out.println("Button Unreachable");
+            System.out.println("Button Unreachable");
             return 0;
         }
         printShip();
@@ -282,7 +296,7 @@ public class ExperimentController {
         {
             if(fireTiles.contains(bot))
             {
-                //System.out.println("death");
+                System.out.println("death");
                 return 0;
             }
 
@@ -290,27 +304,29 @@ public class ExperimentController {
 
             if(bot.equals(button))
             {
-                //System.out.println("YIPPPEEEE");
+                System.out.println("YIPPPEEEE");
                 return 1;
             }
 
             if(fireTiles.contains(bot))
             {
-                //System.out.println("death");
+                System.out.println("death");
                 return 0;
             }
 
             fireSpread();
 
+
             System.out.println();
 
             printShip();
+
         }
     }
 
     public int botTwoExperiment()
     {
-        //System.out.println("**Bot 2 Experiment**");
+        System.out.println("**Bot 2 Experiment**");
         printShip();
         while(true)
         {
@@ -318,13 +334,13 @@ public class ExperimentController {
 
             if(botPath.isEmpty())
             {
-                //System.out.println("Button Unreachable");
+                System.out.println("Button Unreachable");
                 return 0;
             }
             
             if(fireTiles.contains(bot))
             {
-                //System.out.println("death");
+                System.out.println("death");
                 return 0;
             }
 
@@ -332,41 +348,42 @@ public class ExperimentController {
 
             if(bot.equals(button))
             {
-                //System.out.println("YIPPPEEEE");
+                System.out.println("YIPPPEEEE");
                 return 1;
             }
 
             if(fireTiles.contains(bot))
             {
-                //System.out.println("death");
+                System.out.println("death");
                 return 0;
             }
 
             fireSpread();
-
+             
             System.out.println();
 
             printShip();
+            
         }
     }
 
     public int botThreeExperiment()
     {
-        //System.out.println("**Bot 2 Experiment**");
+        System.out.println("**Bot 3 Experiment**");
         printShip();
         while(true)
         {
-            bfsAvoidFire();
+            bfsAvoidFireNeighbor();
 
             if(botPath.isEmpty())
             {
-                //System.out.println("Button Unreachable");
+                System.out.println("Button Unreachable");
                 return 0;
             }
             
             if(fireTiles.contains(bot))
             {
-                //System.out.println("death");
+                System.out.println("death");
                 return 0;
             }
 
@@ -374,13 +391,13 @@ public class ExperimentController {
 
             if(bot.equals(button))
             {
-                //System.out.println("YIPPPEEEE");
+                System.out.println("YIPPPEEEE");
                 return 1;
             }
 
             if(fireTiles.contains(bot))
             {
-                //System.out.println("death");
+                System.out.println("death");
                 return 0;
             }
 
@@ -389,6 +406,7 @@ public class ExperimentController {
             System.out.println();
 
             printShip();
+
         }
     }
 
@@ -525,16 +543,13 @@ public class ExperimentController {
     
     public static void main(String[] args) throws Exception 
     {
-        ExperimentController experimentController = new ExperimentController(1);
+        ExperimentController experimentController = new ExperimentController(0.5);
         experimentController.spawn();
         experimentController.botOneExperiment();
         experimentController.resetSpawn();
         experimentController.botTwoExperiment();
-
-        
-
-
-
+        experimentController.resetSpawn();
+        experimentController.botThreeExperiment();
     }
     
 }

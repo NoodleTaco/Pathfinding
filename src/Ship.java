@@ -9,8 +9,8 @@ public class Ship {
 
     public Ship()
     {
-        this.shipEdgeLength = 10;
-        ship = new Tile[10][10];
+        this.shipEdgeLength = 50;
+        ship = new Tile[50][50];
         neighbors = new ArrayList<Tile>();
         deadEnds = new ArrayList<Tile>();
     }

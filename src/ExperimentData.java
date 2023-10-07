@@ -14,7 +14,7 @@ public class ExperimentData
     {
         for(int i = 0; i < numTimes; i ++)
         {
-            ExperimentController experimentController = new ExperimentController(0.5);
+            ExperimentController experimentController = new ExperimentController(0.7);
             experimentController.spawn();
             qFifty.add(experimentController.botOneExperiment());
         }
@@ -24,7 +24,7 @@ public class ExperimentData
     {
         for(int i = 0; i < numTimes; i ++)
         {
-            ExperimentController experimentController = new ExperimentController(0.5);
+            ExperimentController experimentController = new ExperimentController(0.7);
             experimentController.spawn();
             qFifty.add(experimentController.botTwoExperiment());
         }
@@ -59,8 +59,8 @@ public class ExperimentData
     public static void main(String[] args) throws Exception 
     {
         ExperimentData experimentData = new ExperimentData();
-        experimentData.testBotTwo(20);
-        System.out.println("Average Success Rate for Bot Two over 20 runs: " + getAverage( experimentData.getQList()));
+        experimentData.testBotOne(100);
+        System.out.println("Average Success Rate for Bot Two over 100 runs: " + getAverage( experimentData.getQList()));
 
         
 
