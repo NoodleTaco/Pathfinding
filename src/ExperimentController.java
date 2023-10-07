@@ -84,11 +84,11 @@ public class ExperimentController {
             }
         }
 
-
+        /* 
         System.out.println("Bot Starting Position: " + bot.toString());
         System.out.println("Button Starting Position: " + button.toString());
         System.out.println("Fire Starting Position: " + fireTiles.get(0).toString());
-
+        */
     }
     
     /**
@@ -152,7 +152,7 @@ public class ExperimentController {
 
         botPath.remove(0);
 
-
+        /* 
         System.out.println("Bot Path Size: " + botPath.size());
 
         System.out.print("Bot Path: ");
@@ -161,6 +161,7 @@ public class ExperimentController {
         {
             System.out.print(tile.toString() + " ");
         }
+        */
 
         System.out.println();
 
@@ -371,6 +372,15 @@ public class ExperimentController {
     {
         System.out.println("**Bot 3 Experiment**");
         printShip();
+
+        ArrayList<Tile> fireNeighbors = new ArrayList<Tile>();
+
+        
+        for(Tile tile: fireTiles)
+        {
+            fillNeighbors(tile, fireNeighbors);
+        }
+        
         while(true)
         {
             bfsAvoidFireNeighbor();
@@ -427,7 +437,8 @@ public class ExperimentController {
         {
             if(!fireTiles.contains(tile) && !tile.equals(button))
             {
-                double fireChance = 1 - Math.pow(1-q, numFireNeighbors(tile));
+                double imScared = 1-q;
+                double fireChance = 1 - Math.pow(imScared, numFireNeighbors(tile));
 
                 if(probabilityRoll(fireChance))
                 {
@@ -490,6 +501,15 @@ public class ExperimentController {
     //Prints a visual representation of the ship, used for testing. 
     private void printShip()
     {
+        String reset = "\u001B[0m";
+        String red = "\u001B[31m";
+        String green = "\u001B[32m";
+        String blue = "\u001B[34m";
+        String white = "\u001B[37m";
+        String purple = "\u001B[35m";
+        String orange = "\u001B[33m";
+
+
         for(int row = 0; row < ship.getShipEdgeLength(); row++)
         {
             for (int col = 0; col < ship.getShipEdgeLength(); col++)
@@ -497,27 +517,32 @@ public class ExperimentController {
 
                 if(fireTiles.contains(ship.getShipTile(row, col)))
                 {
-                    System.out.print("F ");
+                    System.out.print(orange + "■ " + reset);
                 }
 
                 else if(bot.equals(ship.getShipTile(row, col)))
                 {
-                    System.out.print("B ");
+                    System.out.print(blue + "■ " + reset);
                 }
 
                 else if(button.equals(ship.getShipTile(row, col)))
                 {
-                    System.out.print("G ");
+                    System.out.print(purple + "■ " + reset);
+                }
+
+                else if(botPath.contains(ship.getShipTile(row, col)))
+                {
+                    System.out.print(red + "■ " + reset);
                 }
 
                 else if(ship.getShipTile(row, col).getOpen())
                 {
-                    System.out.print("O ");
+                    System.out.print(white + "■ " + reset);
                 }
 
                 else 
                 {
-                    System.out.print("C ");
+                    System.out.print(green + "■ " + reset);
                 }
             }
             System.out.println();
@@ -530,6 +555,7 @@ public class ExperimentController {
         button = buttonStartTile;
         fireTiles.clear();
         fireTiles.add(fireStartTile);
+        botPath.clear();
     }
 
 
@@ -548,8 +574,7 @@ public class ExperimentController {
         experimentController.botOneExperiment();
         experimentController.resetSpawn();
         experimentController.botTwoExperiment();
-        experimentController.resetSpawn();
-        experimentController.botThreeExperiment();
+
     }
     
 }

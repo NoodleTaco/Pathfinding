@@ -1,28 +1,29 @@
 import java.util.Random;
 public class Driver {
-    public static void main(String[] args) throws Exception {
-        // TO DO: Try making basic custom class for the ship that details whether a spot is open, closed, has one open neighbor, or 2 or more
-        // TO DO: Figure out dead end mechanism 
-        int shipEdgeLength;
-        Random rand = new Random();
+    public static void main(String[] args) {
+        // ANSI escape codes for colors
+        String reset = "\u001B[0m";
+        String red = "\u001B[31m";
+        String green = "\u001B[32m";
+        String yellow = "\u001B[33m";
+        String blue = "\u001B[34m";
+        String white = "\u001B[37m";
+        String purple = "\u001B[35m";
+        String orange = "\u001B[33m";
 
-        if(args.length > 0)
-        {
-            shipEdgeLength = Integer.parseInt(args[0]);
-            System.out.println("The ship will be " + shipEdgeLength + " by " + shipEdgeLength);
+        // Define the size of the square
+        int size = 5;
+
+        // Loop through rows
+        for (int i = 0; i < size; i++) {
+            // Loop through columns
+            for (int j = 0; j < size; j++) {
+                // Print colored square
+                System.out.print(red + "■ " + reset);
+                System.out.print(blue + "■ " + reset);
+            }
+            // Move to the next line
+            System.out.println();
         }
-        else {
-            System.out.println("No Command Line argument found");
-            return;
-        }
-
-        int[][] ship = new int[shipEdgeLength][shipEdgeLength];
-
-        //To be changed into one statement when data structure of ship is finalized 
-        int xStart = rand.nextInt(shipEdgeLength);
-        int yStart = rand.nextInt(shipEdgeLength);
-        
-        System.out.println(xStart);
-        System.out.println(yStart);
     }
 }

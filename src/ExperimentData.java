@@ -3,11 +3,11 @@ public class ExperimentData
 {
     // Maybe use one hashmap per bot, mapping the q value to its respective arraylist
 
-    private ArrayList<Integer> qFifty;
+    private ArrayList<Integer> qList;
 
     public ExperimentData()
     {
-        qFifty = new ArrayList<Integer>();
+        qList = new ArrayList<Integer>();
     }
 
     public void testBotOne(int numTimes)
@@ -16,7 +16,7 @@ public class ExperimentData
         {
             ExperimentController experimentController = new ExperimentController(0.7);
             experimentController.spawn();
-            qFifty.add(experimentController.botOneExperiment());
+            qList.add(experimentController.botOneExperiment());
         }
     }
 
@@ -26,17 +26,17 @@ public class ExperimentData
         {
             ExperimentController experimentController = new ExperimentController(0.7);
             experimentController.spawn();
-            qFifty.add(experimentController.botTwoExperiment());
+            qList.add(experimentController.botTwoExperiment());
         }
     }
 
 
     public ArrayList<Integer> getQList()
     {
-        return qFifty;
+        return qList;
     }
 
-    public static double getAverage(ArrayList<Integer> list)
+    public static double getAverageOfList(ArrayList<Integer> list)
     {
         int sum = 0;
         for (int num : list) 
@@ -46,6 +46,7 @@ public class ExperimentData
 
         if (list.size() > 0) 
         {
+            System.out.println("Average is: " + sum + " divided by " + list.size());
             return (double) sum / list.size();
         } 
 
@@ -53,14 +54,16 @@ public class ExperimentData
         {
             return 0.0; 
         }
+
+        
     }
 
     
     public static void main(String[] args) throws Exception 
     {
         ExperimentData experimentData = new ExperimentData();
-        experimentData.testBotOne(100);
-        System.out.println("Average Success Rate for Bot Two over 100 runs: " + getAverage( experimentData.getQList()));
+        experimentData.testBotTwo(1000);
+        System.out.println("Average Success Rate : " + getAverageOfList( experimentData.getQList()));
 
         
 

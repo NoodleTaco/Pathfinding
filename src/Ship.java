@@ -9,8 +9,8 @@ public class Ship {
 
     public Ship()
     {
-        this.shipEdgeLength = 50;
-        ship = new Tile[50][50];
+        this.shipEdgeLength = 20;
+        ship = new Tile[20][20];
         neighbors = new ArrayList<Tile>();
         deadEnds = new ArrayList<Tile>();
     }
@@ -120,6 +120,14 @@ public class Ship {
     //Prints a visual representation of the ship, used for testing. 
     private void printShip()
     {
+
+        String reset = "\u001B[0m";
+        String red = "\u001B[31m";
+        String green = "\u001B[32m";
+        String yellow = "\u001B[33m";
+        String white = "\u001B[37m";
+        String purple = "\u001B[35m";
+        
         for(int row = 0; row < shipEdgeLength; row++)
         {
             for (int col = 0; col < shipEdgeLength; col++)
@@ -129,27 +137,27 @@ public class Ship {
                 {
                     if(ship[row][col].getIsDeadEnd())
                     {
-                        System.out.print("D ");
+                        System.out.print(yellow + "■ " + reset);
                     }
                     else
                     {
-                        System.out.print("O ");
+                        System.out.print(white + "■ " + reset);
                     }
                 }
 
                 else if(ship[row][col].getTooManyNeighbors())
                 {
-                    System.out.print("T ");
+                    System.out.print(green + "■ " + reset);
                 }
 
                 else if(ship[row][col].getIsNeighbor())
                 {
-                    System.out.print("N ");
+                    System.out.print(purple + "■ " + reset);
                 }
 
                 else if(!ship[row][col].getOpen())
                 {
-                    System.out.print("C ");
+                    System.out.print(red + "■ " + reset);
                 }
             }
             System.out.println();
