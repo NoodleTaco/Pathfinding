@@ -17,6 +17,12 @@ public class ExperimentController {
 
     private Tile button;
 
+    private Tile botStartTile;
+    
+    private Tile buttonStartTile;
+
+    private Tile fireStartTile;
+
     private ArrayList<Tile> fireTiles;
 
     private ArrayList<Tile> botNeighbors;
@@ -25,13 +31,13 @@ public class ExperimentController {
 
     private double q;
 
-    public ExperimentController()
+    public ExperimentController(double q)
     {
         ship = new Ship();
         fireTiles = new ArrayList<Tile>();
         botNeighbors = new ArrayList<Tile>();
         botPath = new ArrayList<Tile>();
-        q = 0.5;
+        this.q = q;
     }
 
     /**
@@ -43,6 +49,7 @@ public class ExperimentController {
         ship.formShip();
 
         Random rand = new Random();
+        rand.setSeed(710);
 
         while(true)
         {
@@ -50,8 +57,10 @@ public class ExperimentController {
 
             if(bot.getOpen())
             {
+                botStartTile = bot;
                 break;
             }
+            
         }
 
         
@@ -60,6 +69,7 @@ public class ExperimentController {
             button = ship.getShipTile(rand.nextInt(ship.getShipEdgeLength()), rand.nextInt(ship.getShipEdgeLength()));
             if (!bot.equals(button) && button.getOpen())
             {
+                buttonStartTile = button;
                 break;
             }
         }
@@ -69,6 +79,7 @@ public class ExperimentController {
             Tile fireStart = ship.getShipTile(rand.nextInt(ship.getShipEdgeLength()), rand.nextInt(ship.getShipEdgeLength()));
             if(!fireStart.equals(bot) && !fireStart.equals(button) && fireStart.getOpen())
             {
+                fireStartTile = fireStart;
                 fireTiles.add(fireStart);
                 break;
             }
@@ -83,11 +94,85 @@ public class ExperimentController {
      * Creates the botPath for bot one
      * Uses a single run of bfs 
      */
-    public void runBotOne()
+    public void bfsAvoidFire()
     {
         Queue<Tile> queue = new LinkedList<>();
         Set<Tile> visited = new HashSet<>();
         Map<Tile, Tile> parent = new HashMap<>();
+
+        botPath.clear();
+
+        queue.add(bot);
+        visited.add(bot);
+        parent.put(bot, null);
+
+        while(!queue.isEmpty())
+        {
+            Tile curr = queue.poll();
+
+            if(curr.equals(button))
+            {
+                //System.out.println("Found it");
+                break;
+            }
+
+            fillNeighbors(curr, botNeighbors);
+
+            for(Tile tile : botNeighbors)
+            {
+                if(!visited.contains(tile) && !fireTiles.contains(tile))
+                {
+                    queue.add(tile);
+                    visited.add(tile);
+                    parent.put(tile, curr);
+                }
+            }
+
+            botNeighbors.clear();
+
+        }
+
+        if(!parent.containsKey(button))
+        {
+            return;
+        }
+
+        Tile currentTile = button;
+
+        while(currentTile != null)
+        {
+            botPath.add(currentTile);
+            currentTile = parent.get(currentTile);
+        }
+
+        
+
+        Collections.reverse(botPath);
+
+        botPath.remove(0);
+
+        System.out.println("Bot Path Size: " + botPath.size());
+
+        System.out.print("Bot Path: ");
+
+        for(Tile tile: botPath)
+        {
+            System.out.print(tile.toString() + " ");
+        }
+
+        System.out.println();
+
+    }
+
+    
+
+    public void bfsAvoidFireNeighbor()
+    {
+        Queue<Tile> queue = new LinkedList<>();
+        Set<Tile> visited = new HashSet<>();
+        Map<Tile, Tile> parent = new HashMap<>();
+
+        botPath.clear();
 
         queue.add(bot);
         visited.add(bot);
@@ -181,35 +266,38 @@ public class ExperimentController {
     }
 
 
-    public void playBall()
-
+    public int botOneExperiment()
     {
-        spawn();
-        runBotOne();
+        //System.out.println("**Bot 1 Experiment**");
 
+        bfsAvoidFire();
+
+        if(botPath.isEmpty())
+        {
+            //System.out.println("Button Unreachable");
+            return 0;
+        }
         printShip();
-
-
         while(true)
         {
             if(fireTiles.contains(bot))
             {
-                System.out.println("death");
-                return;
+                //System.out.println("death");
+                return 0;
             }
 
             bot = botPath.remove(0);
 
             if(bot.equals(button))
             {
-                System.out.println("YIPPPEEEE");
-                return;
+                //System.out.println("YIPPPEEEE");
+                return 1;
             }
 
             if(fireTiles.contains(bot))
             {
-                System.out.println("death");
-                return;
+                //System.out.println("death");
+                return 0;
             }
 
             fireSpread();
@@ -219,6 +307,92 @@ public class ExperimentController {
             printShip();
         }
     }
+
+    public int botTwoExperiment()
+    {
+        //System.out.println("**Bot 2 Experiment**");
+        printShip();
+        while(true)
+        {
+            bfsAvoidFire();
+
+            if(botPath.isEmpty())
+            {
+                //System.out.println("Button Unreachable");
+                return 0;
+            }
+            
+            if(fireTiles.contains(bot))
+            {
+                //System.out.println("death");
+                return 0;
+            }
+
+            bot = botPath.remove(0);
+
+            if(bot.equals(button))
+            {
+                //System.out.println("YIPPPEEEE");
+                return 1;
+            }
+
+            if(fireTiles.contains(bot))
+            {
+                //System.out.println("death");
+                return 0;
+            }
+
+            fireSpread();
+
+            System.out.println();
+
+            printShip();
+        }
+    }
+
+    public int botThreeExperiment()
+    {
+        //System.out.println("**Bot 2 Experiment**");
+        printShip();
+        while(true)
+        {
+            bfsAvoidFire();
+
+            if(botPath.isEmpty())
+            {
+                //System.out.println("Button Unreachable");
+                return 0;
+            }
+            
+            if(fireTiles.contains(bot))
+            {
+                //System.out.println("death");
+                return 0;
+            }
+
+            bot = botPath.remove(0);
+
+            if(bot.equals(button))
+            {
+                //System.out.println("YIPPPEEEE");
+                return 1;
+            }
+
+            if(fireTiles.contains(bot))
+            {
+                //System.out.println("death");
+                return 0;
+            }
+
+            fireSpread();
+
+            System.out.println();
+
+            printShip();
+        }
+    }
+
+
 
     private void fireSpread()
     {
@@ -233,7 +407,7 @@ public class ExperimentController {
         
         for(Tile tile: fireNeighbors)
         {
-            if(!fireTiles.contains(tile))
+            if(!fireTiles.contains(tile) && !tile.equals(button))
             {
                 double fireChance = 1 - Math.pow(1-q, numFireNeighbors(tile));
 
@@ -295,43 +469,52 @@ public class ExperimentController {
         return randomValue < probability;
     }
 
-        //Prints a visual representation of the ship, used for testing. 
-        private void printShip()
+    //Prints a visual representation of the ship, used for testing. 
+    private void printShip()
+    {
+        for(int row = 0; row < ship.getShipEdgeLength(); row++)
         {
-            for(int row = 0; row < ship.getShipEdgeLength(); row++)
+            for (int col = 0; col < ship.getShipEdgeLength(); col++)
             {
-                for (int col = 0; col < ship.getShipEdgeLength(); col++)
+
+                if(fireTiles.contains(ship.getShipTile(row, col)))
                 {
-
-                    if(fireTiles.contains(ship.getShipTile(row, col)))
-                    {
-                        System.out.print("F ");
-                    }
-
-                    else if(bot.equals(ship.getShipTile(row, col)))
-                    {
-                        System.out.print("B ");
-                    }
-
-                    else if(button.equals(ship.getShipTile(row, col)))
-                    {
-                        System.out.print("G ");
-                    }
-
-                    else if(ship.getShipTile(row, col).getOpen())
-                    {
-                        System.out.print("O ");
-                    }
-
-                    else 
-                    {
-                        System.out.print("C ");
-                    }
+                    System.out.print("F ");
                 }
-                System.out.println();
+
+                else if(bot.equals(ship.getShipTile(row, col)))
+                {
+                    System.out.print("B ");
+                }
+
+                else if(button.equals(ship.getShipTile(row, col)))
+                {
+                    System.out.print("G ");
+                }
+
+                else if(ship.getShipTile(row, col).getOpen())
+                {
+                    System.out.print("O ");
+                }
+
+                else 
+                {
+                    System.out.print("C ");
+                }
             }
+            System.out.println();
         }
-    
+    }
+
+    public void resetSpawn()
+    {
+        bot = botStartTile;
+        button = buttonStartTile;
+        fireTiles.clear();
+        fireTiles.add(fireStartTile);
+    }
+
+
 
     public Ship getShip()
     {
@@ -342,8 +525,14 @@ public class ExperimentController {
     
     public static void main(String[] args) throws Exception 
     {
-        ExperimentController experimentController = new ExperimentController();
-        experimentController.playBall();
+        ExperimentController experimentController = new ExperimentController(1);
+        experimentController.spawn();
+        experimentController.botOneExperiment();
+        experimentController.resetSpawn();
+        experimentController.botTwoExperiment();
+
+        
+
 
 
     }

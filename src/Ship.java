@@ -34,7 +34,7 @@ public class Ship {
         }
 
         Random rand = new Random();
-        rand.setSeed(450);      // FOR TESTING , MUST CHANGE WHEN CONDUCTING EXPERIMENTS
+        rand.setSeed(416);     // FOR TESTING , MUST CHANGE WHEN CONDUCTING EXPERIMENTS
 
 
         int xStart = rand.nextInt(shipEdgeLength);
@@ -246,6 +246,7 @@ public class Ship {
         int startingDeadEnds = deadEnds.size();
         System.out.println("Number of Starting Dead ends: " + startingDeadEnds);
         Random rand = new Random();
+        rand.setSeed(416);
         
         //for(int i = 0; i < 1; i++)
         while(deadEnds.size() > startingDeadEnds/2)
