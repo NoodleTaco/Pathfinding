@@ -9,8 +9,8 @@ public class Ship {
 
     public Ship()
     {
-        this.shipEdgeLength = 20;
-        ship = new Tile[20][20];
+        this.shipEdgeLength = 100;
+        ship = new Tile[100][100];
         neighbors = new ArrayList<Tile>();
         deadEnds = new ArrayList<Tile>();
     }
@@ -21,6 +21,9 @@ public class Ship {
         ship = new Tile[shipEdgeLength][shipEdgeLength];
     }
 
+
+
+    
     public void formShip()
     {
         for(int row = 0; row < shipEdgeLength; row++)
@@ -34,7 +37,6 @@ public class Ship {
         }
 
         Random rand = new Random();
-        rand.setSeed(416);     // FOR TESTING , MUST CHANGE WHEN CONDUCTING EXPERIMENTS
 
 
         int xStart = rand.nextInt(shipEdgeLength);
@@ -176,7 +178,7 @@ public class Ship {
 
     private void printDeadEndsList()
     {
-        System.out.println("Number of Dead ends: " + deadEnds.size());
+        //System.out.println("Number of Dead ends: " + deadEnds.size());
         for(int i = 0; i < deadEnds.size(); i++)
         {
             System.out.print(deadEnds.get(i).getRow() + ", " + deadEnds.get(i).getCol());
@@ -252,9 +254,8 @@ public class Ship {
         findDeadEnds();
 
         int startingDeadEnds = deadEnds.size();
-        System.out.println("Number of Starting Dead ends: " + startingDeadEnds);
+        //System.out.println("Number of Starting Dead ends: " + startingDeadEnds);
         Random rand = new Random();
-        rand.setSeed(416);
         
         //for(int i = 0; i < 1; i++)
         while(deadEnds.size() > startingDeadEnds/2)
@@ -283,7 +284,6 @@ public class Ship {
 
             
             int randTile = rand.nextInt(deadEndNeighbors.size());
-            rand.setSeed(16);
             deadEndNeighbors.get(randTile).setOpen(true);
             tile.setIsDeadEnd(false);
             deadEnds.remove(tile);

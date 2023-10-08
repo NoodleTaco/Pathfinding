@@ -163,7 +163,7 @@ public class ExperimentController {
         }
         */
 
-        System.out.println();
+        //System.out.println();
 
     }
 
@@ -283,21 +283,21 @@ public class ExperimentController {
 
     public int botOneExperiment()
     {
-        System.out.println("**Bot 1 Experiment**");
+        //System.out.println("**Bot 1 Experiment**");
 
         bfsAvoidFire();
 
         if(botPath.isEmpty())
         {
-            System.out.println("Button Unreachable");
+            //System.out.println("Button Unreachable");
             return 0;
         }
-        printShip();
+        //printShip();
         while(true)
         {
             if(fireTiles.contains(bot))
             {
-                System.out.println("death");
+                //System.out.println("death");
                 return 0;
             }
 
@@ -305,43 +305,43 @@ public class ExperimentController {
 
             if(bot.equals(button))
             {
-                System.out.println("YIPPPEEEE");
+                //System.out.println("YIPPPEEEE");
                 return 1;
             }
 
             if(fireTiles.contains(bot))
             {
-                System.out.println("death");
+                //System.out.println("death");
                 return 0;
             }
 
             fireSpread();
 
 
-            System.out.println();
+            //System.out.println();
 
-            printShip();
+            //printShip();
 
         }
     }
 
     public int botTwoExperiment()
     {
-        System.out.println("**Bot 2 Experiment**");
-        printShip();
+        //System.out.println("**Bot 2 Experiment**");
+        //printShip();
         while(true)
         {
             bfsAvoidFire();
 
             if(botPath.isEmpty())
             {
-                System.out.println("Button Unreachable");
+                //System.out.println("Button Unreachable");
                 return 0;
             }
             
             if(fireTiles.contains(bot))
             {
-                System.out.println("death");
+                //System.out.println("death");
                 return 0;
             }
 
@@ -349,51 +349,43 @@ public class ExperimentController {
 
             if(bot.equals(button))
             {
-                System.out.println("YIPPPEEEE");
+                //System.out.println("YIPPPEEEE");
                 return 1;
             }
 
             if(fireTiles.contains(bot))
             {
-                System.out.println("death");
+                //System.out.println("death");
                 return 0;
             }
 
             fireSpread();
              
-            System.out.println();
+            //System.out.println();
 
-            printShip();
+            //printShip();
             
         }
     }
 
     public int botThreeExperiment()
     {
-        System.out.println("**Bot 3 Experiment**");
-        printShip();
+        //System.out.println("**Bot 3 Experiment**");
+        //printShip();
 
-        ArrayList<Tile> fireNeighbors = new ArrayList<Tile>();
-
-        
-        for(Tile tile: fireTiles)
-        {
-            fillNeighbors(tile, fireNeighbors);
-        }
-        
         while(true)
         {
             bfsAvoidFireNeighbor();
 
             if(botPath.isEmpty())
             {
-                System.out.println("Button Unreachable");
+                //System.out.println("Button Unreachable");
                 return 0;
             }
             
             if(fireTiles.contains(bot))
             {
-                System.out.println("death");
+                //System.out.println("death");
                 return 0;
             }
 
@@ -401,21 +393,21 @@ public class ExperimentController {
 
             if(bot.equals(button))
             {
-                System.out.println("YIPPPEEEE");
+                //System.out.println("YIPPPEEEE");
                 return 1;
             }
 
             if(fireTiles.contains(bot))
             {
-                System.out.println("death");
+                //System.out.println("death");
                 return 0;
             }
 
             fireSpread();
 
-            System.out.println();
+            //System.out.println();
 
-            printShip();
+            //printShip();
 
         }
     }
@@ -571,9 +563,8 @@ public class ExperimentController {
     {
         ExperimentController experimentController = new ExperimentController(0.5);
         experimentController.spawn();
-        experimentController.botOneExperiment();
-        experimentController.resetSpawn();
-        experimentController.botTwoExperiment();
+        System.out.println (experimentController.botTwoExperiment()); 
+
 
     }
     
