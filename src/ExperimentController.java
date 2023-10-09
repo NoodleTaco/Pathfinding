@@ -4,10 +4,12 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Map;
+import java.util.PriorityQueue;
 import java.util.Queue;
 import java.util.Random;
 import java.util.Set;
 import java.util.Iterator;
+import java.lang.Math;
 
 public class ExperimentController {
 
@@ -25,7 +27,6 @@ public class ExperimentController {
 
     private ArrayList<Tile> fireTiles;
 
-    private ArrayList<Tile> botNeighbors;
 
     private ArrayList<Tile> botPath;
 
@@ -35,7 +36,14 @@ public class ExperimentController {
     {
         ship = new Ship();
         fireTiles = new ArrayList<Tile>();
-        botNeighbors = new ArrayList<Tile>();
+        botPath = new ArrayList<Tile>();
+        this.q = q;
+    }
+
+    public ExperimentController(double q, int shipEdgeLength)
+    {
+        ship = new Ship(shipEdgeLength);
+        fireTiles = new ArrayList<Tile>();
         botPath = new ArrayList<Tile>();
         this.q = q;
     }
@@ -100,12 +108,14 @@ public class ExperimentController {
         Queue<Tile> queue = new LinkedList<>();
         Set<Tile> visited = new HashSet<>();
         Map<Tile, Tile> parent = new HashMap<>();
+        Set<Tile> botNeighbors = new HashSet<Tile>();
 
         botPath.clear();
 
         queue.add(bot);
         visited.add(bot);
         parent.put(bot, null);
+        
 
         while(!queue.isEmpty())
         {
@@ -117,7 +127,7 @@ public class ExperimentController {
                 break;
             }
 
-            fillNeighbors(curr, botNeighbors);
+            fillNeighborsSet(curr, botNeighbors);
 
             for(Tile tile : botNeighbors)
             {
@@ -174,8 +184,8 @@ public class ExperimentController {
         Queue<Tile> queue = new LinkedList<>();
         Set<Tile> visited = new HashSet<>();
         Map<Tile, Tile> parent = new HashMap<>();
-        ArrayList<Tile> fireNeighbors = new ArrayList<Tile>();
-
+        Set<Tile> botNeighbors = new HashSet<Tile>();
+        Set<Tile> fireNeighbors = new HashSet<Tile>();
         botPath.clear();
 
         queue.add(bot);
@@ -187,7 +197,7 @@ public class ExperimentController {
 
         for(Tile tile: fireTiles)
         {
-            fillNeighbors(tile, fireNeighbors);
+            fillNeighborsSet(tile, fireNeighbors);
         }
         
 
@@ -201,7 +211,7 @@ public class ExperimentController {
                 break;
             }
 
-            fillNeighbors(curr, botNeighbors);
+            fillNeighborsSet(curr, botNeighbors);
 
             for(Tile tile : botNeighbors)
             {
@@ -251,12 +261,167 @@ public class ExperimentController {
         */
     }
 
+    private void aStar()
+    {
+        TilePriorityQueue fringe = new TilePriorityQueue();
+        Map<Tile, Integer> distTo = new HashMap<>();
+        Map<Tile, Tile> parent = new HashMap<>();
+        Set<Tile> botNeighbors = new HashSet<Tile>();
+        Set<Tile> fireNeighbors = new HashSet<Tile>();
+
+        botPath.clear();
+
+        fringe.add(bot, h(bot));
+        distTo.put(bot, 0);
+        parent.put(bot, null);
+
+        for(Tile tile: fireTiles)
+        {
+            fillNeighborsSet(tile, fireNeighbors);
+        }
+
+        while(!fringe.isEmpty())
+        {
+            Tile curr = fringe.poll();
+            if(curr.equals(button))
+            {
+                break;
+            }
+
+            fillNeighborsSet(curr, botNeighbors);
+
+            for(Tile tile : botNeighbors)
+            {
+                if(!fireTiles.contains(tile) && !fireNeighbors.contains(tile))
+                {
+                    int tempDist = distTo.get(curr) + 1;
+
+                    if(distTo.containsKey(tile))
+                    {
+                        if(distTo.get(tile) > tempDist)
+                        {
+                            distTo.put(tile, tempDist);
+                            parent.put(tile, curr);
+                            fringe.add(tile, distTo.get(tile)  + h(tile));
+                        }
+                    }
+                    else
+                    {
+                        distTo.put(tile, tempDist);
+                        parent.put(tile, curr);
+                        fringe.add(tile, distTo.get(tile)  + h(tile));
+                    }
+                }
+                
+            }
+            botNeighbors.clear();
+        }
+        if(!parent.containsKey(button))
+        {
+            aStarBackUp();
+            return;
+        }
+        
+        Tile currentTile = button;
+
+        while(currentTile != null)
+        {
+
+            botPath.add(currentTile);
+            currentTile = parent.get(currentTile);
+        }
+
+        Collections.reverse(botPath);
+
+        botPath.remove(0);
+
+    }
+
+
+    
+
+    private void aStarBackUp()
+    {
+        TilePriorityQueue fringe = new TilePriorityQueue();
+        Map<Tile, Integer> distTo = new HashMap<>();
+        Map<Tile, Tile> parent = new HashMap<>();
+        Set<Tile> botNeighbors = new HashSet<Tile>();
+
+        botPath.clear();
+
+        fringe.add(bot, h(bot));
+        distTo.put(bot, 0);
+        parent.put(bot, null);
+
+        while(!fringe.isEmpty())
+        {
+            Tile curr = fringe.poll();
+            if(curr.equals(button))
+            {
+                break;
+            }
+
+            fillNeighborsSet(curr, botNeighbors);
+
+            for(Tile tile : botNeighbors)
+            {
+                if(!fireTiles.contains(tile))
+                {
+                    int tempDist = distTo.get(curr) + 1;
+
+                    if(distTo.containsKey(tile))
+                    {
+                        if(distTo.get(tile) > tempDist)
+                        {
+                            distTo.put(tile, tempDist);
+                            parent.put(tile, curr);
+                            fringe.add(tile, distTo.get(tile)  + h(tile));
+                        }
+                    }
+                    else
+                    {
+                        distTo.put(tile, tempDist);
+                        parent.put(tile, curr);
+                        fringe.add(tile, distTo.get(tile)  + h(tile));
+                    }
+                }
+                
+            }
+            botNeighbors.clear();
+        }
+        if(!parent.containsKey(button))
+        {
+            return;
+        }
+        
+        Tile currentTile = button;
+
+        while(currentTile != null)
+        {
+
+            botPath.add(currentTile);
+            currentTile = parent.get(currentTile);
+        }
+
+        Collections.reverse(botPath);
+
+        botPath.remove(0);
+
+    }
+
+    
+
+    private int h(Tile tile)
+    {
+        return Math.abs(tile.getRow() - button.getRow()) + Math.abs(tile.getCol() - button.getCol());
+    }
+
     /**
      * Adds open tiles adjacent to a select tile to a list
      * @param tile the tile whose neighbors are being considered
      * @param list the list where tile objects are being added 
      */
-    private void fillNeighbors(Tile tile, ArrayList<Tile> list)
+    private void fillNeighborsList(Tile tile, ArrayList<Tile> list)
     {
         if(tile.getRow() + 1 < ship.getShipEdgeLength() && ship.getShipTile(tile.getRow() + 1, tile.getCol()).getOpen() && !list.contains(ship.getShipTile(tile.getRow() + 1, tile.getCol()))) 
         {
@@ -278,6 +443,29 @@ public class ExperimentController {
             list.add(ship.getShipTile(tile.getRow(), tile.getCol() -1));
         }
         
+    }
+
+    private void fillNeighborsSet(Tile tile, Set<Tile> set)
+    {
+        if(tile.getRow() + 1 < ship.getShipEdgeLength() && ship.getShipTile(tile.getRow() + 1, tile.getCol()).getOpen()) 
+        {
+            set.add(ship.getShipTile(tile.getRow() + 1, tile.getCol()));
+        }
+
+        if(tile.getRow() - 1 > -1 && ship.getShipTile(tile.getRow() - 1, tile.getCol()).getOpen() )
+        {
+            set.add(ship.getShipTile(tile.getRow() - 1, tile.getCol()));
+        }
+
+        if(tile.getCol() + 1 < ship.getShipEdgeLength() && ship.getShipTile(tile.getRow() , tile.getCol() + 1).getOpen() )
+        {
+            set.add(ship.getShipTile(tile.getRow(), tile.getCol() + 1));
+        }
+
+        if(tile.getCol() - 1 > -1 && ship.getShipTile(tile.getRow() , tile.getCol() -1).getOpen() )
+        {
+            set.add(ship.getShipTile(tile.getRow(), tile.getCol() -1));
+        }
     }
 
 
@@ -412,6 +600,50 @@ public class ExperimentController {
         }
     }
 
+    public int botFourExperiment()
+    {
+        //System.out.println("**Bot 4 Experiment**");
+        //printShip();
+
+        while(true)
+        {
+            aStar();
+
+            if(botPath.isEmpty())
+            {
+                //System.out.println("Button Unreachable");
+                return 0;
+            }
+            
+            if(fireTiles.contains(bot))
+            {
+                //System.out.println("death");
+                return 0;
+            }
+
+            bot = botPath.remove(0);
+
+            if(bot.equals(button))
+            {
+                //System.out.println("YIPPPEEEE");
+                return 1;
+            }
+
+            if(fireTiles.contains(bot))
+            {
+                //System.out.println("death");
+                return 0;
+            }
+
+            fireSpread();
+
+            //System.out.println();
+
+            //printShip();
+
+        }
+    }
+
 
 
     private void fireSpread()
@@ -422,7 +654,7 @@ public class ExperimentController {
 
         for(Tile tile: fireTiles)
         {
-            fillNeighbors(tile, fireNeighbors);
+            fillNeighborsList(tile, fireNeighbors);
         }
         
         for(Tile tile: fireNeighbors)
@@ -561,9 +793,12 @@ public class ExperimentController {
     
     public static void main(String[] args) throws Exception 
     {
-        ExperimentController experimentController = new ExperimentController(0.5);
+        long startTime = System.currentTimeMillis();
+        ExperimentController experimentController = new ExperimentController(0.5, 25);
         experimentController.spawn();
         System.out.println (experimentController.botTwoExperiment()); 
+        long endTime = System.currentTimeMillis();
+        System.out.println("Execution time: " + (endTime - startTime) + " milliseconds");
 
 
     }
