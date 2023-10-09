@@ -13,6 +13,8 @@ public class ExperimentData
 
     private ArrayList<Double> botFourList;
 
+    private ArrayList<Double> botFiveList;
+
     private ArrayList<Long> botOneRunTime;
 
     private ArrayList<Long> botTwoRunTime;
@@ -21,7 +23,9 @@ public class ExperimentData
 
     private ArrayList<Long> botFourRunTime;
 
-    static final int NUMBER_OF_TESTS = 10;
+    private ArrayList<Long> botFiveRunTime;
+
+    static final int NUMBER_OF_TESTS = 50;
 
     static final int SHIP_LENGTH_FOR_Q_GRAPH = 50;
 
@@ -31,11 +35,13 @@ public class ExperimentData
         botTwoList = new ArrayList<Double>();
         botThreeList = new ArrayList<Double>();
         botFourList = new ArrayList<Double>();
+        botFiveList = new ArrayList<Double>();
 
         botOneRunTime = new ArrayList<Long>();
         botTwoRunTime = new ArrayList<Long>();
         botThreeRunTime = new ArrayList<Long>();
         botFourRunTime = new ArrayList<Long>();
+        botFiveRunTime = new ArrayList<Long>();
     }
 
     public void fillBotDataLists()
@@ -47,6 +53,7 @@ public class ExperimentData
             ArrayList<Integer> botTwoResults = new ArrayList<Integer>();
             ArrayList<Integer> botThreeResults = new ArrayList<Integer>();
             ArrayList<Integer> botFourResults = new ArrayList<Integer>();
+            ArrayList<Integer> botFiveResults = new ArrayList<Integer>();
 
             for(int test = 0; test < NUMBER_OF_TESTS; test ++)
             {
@@ -59,12 +66,15 @@ public class ExperimentData
                 botThreeResults.add(experimentController.botThreeExperiment());
                 experimentController.resetSpawn();
                 botFourResults.add(experimentController.botFourExperiment());
+                experimentController.resetSpawn();
+                botFiveResults.add(experimentController.botFiveExperiment());
             }
 
             botOneList.add(getAverageOfIntList(botOneResults));
             botTwoList.add(getAverageOfIntList(botTwoResults));
             botThreeList.add(getAverageOfIntList(botThreeResults));
             botFourList.add(getAverageOfIntList(botFourResults));
+            botFiveList.add(getAverageOfIntList(botFiveResults));
             System.out.println("q val " + qVal + " completed");
             qVal += 0.1;
         }
@@ -72,52 +82,69 @@ public class ExperimentData
 
     public void fillRunTimes()
     {
-        for(int shipEdgeLength = 25; shipEdgeLength <= 125; shipEdgeLength +=25)
+        long botOneTotalRunTime = 0;
+        long botTwoTotalRunTime = 0;
+        long botThreeTotalRunTime = 0;
+        long botFourTotalRunTime = 0;
+        long botFiveTotalRunTime = 0;
+
+        for(int shipEdgeLength = 25; shipEdgeLength <= 150; shipEdgeLength +=25)
         {
-            long startTime = System.currentTimeMillis();
             for(int test = 0; test < NUMBER_OF_TESTS; test++)
             {
-                ExperimentController botFourExperimentController = new ExperimentController(0.5, shipEdgeLength);
-                botFourExperimentController.spawn();
-                botFourExperimentController.botFourExperiment();
-            }
-            long endTime = System.currentTimeMillis();
+                ExperimentController experimentController = new ExperimentController(0.5, shipEdgeLength);
+                experimentController.spawn();
 
-            botFourRunTime.add((endTime-startTime) / NUMBER_OF_TESTS);   
+                //Bot One
+                long botOneStartTime = System.currentTimeMillis();
+                experimentController.botOneExperiment();
+                long botOneEndTime = System.currentTimeMillis();
+                botOneTotalRunTime += (botOneEndTime-botOneStartTime);
+
+                experimentController.resetSpawn();
+
+                //Bot Two
+                long botTwoStartTime = System.currentTimeMillis();
+                experimentController.botTwoExperiment();
+                long botTwoEndTime = System.currentTimeMillis();
+                botTwoTotalRunTime += (botTwoEndTime-botTwoStartTime);
+
+                experimentController.resetSpawn();
+
+                //Bot Three
+                long botThreeStartTime = System.currentTimeMillis();
+                experimentController.botThreeExperiment();
+                long botThreeEndTime = System.currentTimeMillis();
+                botThreeTotalRunTime += (botThreeEndTime-botThreeStartTime);
+
+                experimentController.resetSpawn();
+
+                //Bot Four
+                long botFourStartTime = System.currentTimeMillis();
+                experimentController.botFourExperiment();
+                long botFourEndTime = System.currentTimeMillis();
+                botFourTotalRunTime += (botFourEndTime-botFourStartTime);
+
+                experimentController.resetSpawn();
+
+                //Bot Five
+                long botFiveStartTime = System.currentTimeMillis();
+                experimentController.botFiveExperiment();
+                long botFiveEndTime = System.currentTimeMillis();
+                botFiveTotalRunTime += (botFiveEndTime-botFiveStartTime);
+            }
+
+            botOneRunTime.add(botOneTotalRunTime / NUMBER_OF_TESTS);
+            botTwoRunTime.add(botTwoTotalRunTime / NUMBER_OF_TESTS);
+            botThreeRunTime.add(botThreeTotalRunTime / NUMBER_OF_TESTS);
+            botFourRunTime.add(botFourTotalRunTime / NUMBER_OF_TESTS);
+            botFiveRunTime.add(botFiveTotalRunTime / NUMBER_OF_TESTS);
+            System.out.println("Ship Edge Length: " + shipEdgeLength + " Completed");
         }
 
-        for(int shipEdgeLength = 25; shipEdgeLength <= 125; shipEdgeLength +=25)
-        {
-            //Bot One
+        /* 
 
-            long startTime = System.currentTimeMillis();
-            for(int test = 0; test < NUMBER_OF_TESTS; test++)
-            {
-                ExperimentController botOneExperimentController = new ExperimentController(0.5, shipEdgeLength);
-                botOneExperimentController.spawn();
-                botOneExperimentController.botOneExperiment();
-            }
-            long endTime = System.currentTimeMillis();
-
-            botOneRunTime.add((endTime-startTime) / NUMBER_OF_TESTS); 
-        }
-
-        for(int shipEdgeLength = 25; shipEdgeLength <= 125; shipEdgeLength +=25)
-        {
-            long startTime = System.currentTimeMillis();
-            for(int test = 0; test < NUMBER_OF_TESTS; test++)
-            {
-                ExperimentController botTwoExperimentController = new ExperimentController(0.5, shipEdgeLength);
-                botTwoExperimentController.spawn();
-                botTwoExperimentController.botTwoExperiment();
-            }
-            long endTime = System.currentTimeMillis();
-
-            botTwoRunTime.add((endTime-startTime) / NUMBER_OF_TESTS); 
-            
-        }
-
-        for(int shipEdgeLength = 25; shipEdgeLength <= 125; shipEdgeLength +=25)
+        for(int shipEdgeLength = 25; shipEdgeLength <= 150; shipEdgeLength +=25)
         {
             //Bot Three
             long startTime = System.currentTimeMillis();
@@ -131,11 +158,11 @@ public class ExperimentData
 
             botThreeRunTime.add((endTime-startTime) / NUMBER_OF_TESTS);   
         }
-
-
-
+        */
 
     }
+
+
 
     public void printAllBotDataLists()
     {
@@ -172,7 +199,6 @@ public class ExperimentData
         System.out.println();
 
 
-
         System.out.println(" Bot Two Run Time : " + "milliseconds");
 
         this.printBotRunTime(this.getBotTwoRunTime());
@@ -189,6 +215,11 @@ public class ExperimentData
 
         this.printBotRunTime(this.getBotFourRunTime());
 
+        System.out.println();
+
+        System.out.println(" Bot Five Run Time : " + "milliseconds");
+
+        this.printBotRunTime(this.getBotFiveRunTime());
 
     }
 
@@ -227,7 +258,7 @@ public class ExperimentData
     public void printBotRunTime(ArrayList<Long> list)
     {
         int index = 0;
-        for (int i = 25; i <= 125; i +=25)
+        for (int i = 25; i <= 150; i +=25)
         {
             System.out.println("Ship length: " + i + " Average Run Time: " + list.get(index));
             index++;
@@ -255,6 +286,11 @@ public class ExperimentData
     {
         return botFourList;
     }
+
+    public ArrayList<Double> getBotFiveList()
+    {
+        return botFiveList;
+    }
     
     public ArrayList<Long> getBotOneRunTime()
     {
@@ -274,6 +310,11 @@ public class ExperimentData
     public ArrayList<Long> getBotFourRunTime()
     {
         return botFourRunTime;
+    }
+
+    public ArrayList<Long> getBotFiveRunTime()
+    {
+        return botFiveRunTime;
     }
     
 

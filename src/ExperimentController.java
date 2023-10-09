@@ -177,6 +177,72 @@ public class ExperimentController {
 
     }
 
+    public int distToButton(Tile startTile)
+    {
+        Queue<Tile> queue = new LinkedList<>();
+        Set<Tile> visited = new HashSet<>();
+        Map<Tile, Tile> parent = new HashMap<>();
+        Set<Tile> openNeighbors = new HashSet<Tile>();
+
+        queue.add(startTile);
+        visited.add(startTile);
+        parent.put(startTile, null);
+        
+
+        while(!queue.isEmpty())
+        {
+            Tile curr = queue.poll();
+
+            if(curr.equals(button))
+            {
+                //System.out.println("Found it");
+                break;
+            }
+
+            fillNeighborsSet(curr, openNeighbors);
+
+            for(Tile tile : openNeighbors)
+            {
+                if(!visited.contains(tile))
+                {
+                    queue.add(tile);
+                    visited.add(tile);
+                    parent.put(tile, curr);
+                }
+            }
+
+            openNeighbors.clear();
+
+        }
+
+        int count = 0;
+
+        Tile currentTile = button;
+
+        while(currentTile != null)
+        {
+            count++;
+            currentTile = parent.get(currentTile);
+        }
+
+        
+
+        return count;
+
+        /* 
+        System.out.println("Bot Path Size: " + botPath.size());
+
+        System.out.print("Bot Path: ");
+
+        for(Tile tile: botPath)
+        {
+            System.out.print(tile.toString() + " ");
+        }
+        */
+
+        //System.out.println();
+    }
+
     
 
     public void bfsAvoidFireNeighbor()
@@ -261,7 +327,7 @@ public class ExperimentController {
         */
     }
 
-    private void aStar()
+    private void aStarAvoidFireNeighbors()
     {
         TilePriorityQueue fringe = new TilePriorityQueue();
         Map<Tile, Integer> distTo = new HashMap<>();
@@ -318,7 +384,7 @@ public class ExperimentController {
         }
         if(!parent.containsKey(button))
         {
-            aStarBackUp();
+            aStarAvoidFire();
             return;
         }
         
@@ -340,7 +406,7 @@ public class ExperimentController {
 
     
 
-    private void aStarBackUp()
+    private void aStarAvoidFire()
     {
         TilePriorityQueue fringe = new TilePriorityQueue();
         Map<Tile, Integer> distTo = new HashMap<>();
@@ -607,7 +673,7 @@ public class ExperimentController {
 
         while(true)
         {
-            aStar();
+            aStarAvoidFireNeighbors();
 
             if(botPath.isEmpty())
             {
@@ -644,6 +710,58 @@ public class ExperimentController {
         }
     }
 
+    public int botFiveExperiment()
+    {
+        if(isBotCloser())
+        {
+            return 1;
+        }
+        else
+        {
+            while(true)
+            {
+                aStarAvoidFireNeighbors();
+
+                if(botPath.isEmpty())
+                {
+                    //System.out.println("Button Unreachable");
+                    return 0;
+                }
+                
+                if(fireTiles.contains(bot))
+                {
+                    //System.out.println("death");
+                    return 0;
+                }
+
+                bot = botPath.remove(0);
+
+                if(bot.equals(button))
+                {
+                    //System.out.println("YIPPPEEEE");
+                    return 1;
+                }
+
+                if(fireTiles.contains(bot))
+                {
+                    //System.out.println("death");
+                    return 0;
+                }
+
+                fireSpread();
+
+                //System.out.println();
+
+                //printShip();
+
+            }
+        }
+    }
+
+    private boolean isBotCloser()
+    {
+        return distToButton(botStartTile) <= distToButton(fireStartTile);
+    }
 
 
     private void fireSpread()
@@ -796,7 +914,7 @@ public class ExperimentController {
         long startTime = System.currentTimeMillis();
         ExperimentController experimentController = new ExperimentController(0.5, 25);
         experimentController.spawn();
-        System.out.println (experimentController.botTwoExperiment()); 
+        System.out.println (experimentController.botFiveExperiment()); 
         long endTime = System.currentTimeMillis();
         System.out.println("Execution time: " + (endTime - startTime) + " milliseconds");
 

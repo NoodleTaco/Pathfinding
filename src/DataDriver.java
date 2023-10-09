@@ -49,7 +49,7 @@ public class DataDriver {
 
         ArrayList<Integer> shipEdgeLengths = new ArrayList<Integer>();
 
-        shipEdgeLengths.add(25); shipEdgeLengths.add(50); shipEdgeLengths.add(75); shipEdgeLengths.add(100); shipEdgeLengths.add(125); //shipEdgeLengths.add(150); 
+        shipEdgeLengths.add(25); shipEdgeLengths.add(50); shipEdgeLengths.add(75); shipEdgeLengths.add(100); shipEdgeLengths.add(125); shipEdgeLengths.add(150); 
 
         //System.out.println("QVals size: " + qVals.size() + " Bot One List size: " + experimentData.getBotOneList());
 
@@ -66,9 +66,10 @@ public class DataDriver {
         botSuccessRateChart.addSeries("Bot 2", qVals, experimentData.getBotTwoList());
         botSuccessRateChart.addSeries("Bot 3", qVals, experimentData.getBotThreeList());
         botSuccessRateChart.addSeries("Bot 4", qVals, experimentData.getBotFourList());
+        botSuccessRateChart.addSeries("Bot 5", qVals, experimentData.getBotFiveList());
 
         botSuccessRateChart.getStyler().setMarkerSize(8);
-        botSuccessRateChart.getStyler().setLegendPosition(Styler.LegendPosition.InsideNW);
+        botSuccessRateChart.getStyler().setLegendPosition(Styler.LegendPosition.InsideNE);
         
         new SwingWrapper<>(botSuccessRateChart).displayChart();
 
@@ -85,6 +86,7 @@ public class DataDriver {
         botRunTimeChart.addSeries("Bot 2", shipEdgeLengths, experimentData.getBotTwoRunTime());
         botRunTimeChart.addSeries("Bot 3", shipEdgeLengths, experimentData.getBotThreeRunTime());
         botRunTimeChart.addSeries("Bot 4", shipEdgeLengths, experimentData.getBotFourRunTime());
+        botRunTimeChart.addSeries("Bot 5", shipEdgeLengths, experimentData.getBotFiveRunTime());
 
         botRunTimeChart.getStyler().setMarkerSize(8);
         botRunTimeChart.getStyler().setLegendPosition(Styler.LegendPosition.InsideNW);
