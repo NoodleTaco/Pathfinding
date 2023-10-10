@@ -1,8 +1,10 @@
 import java.util.ArrayList;
-
+/**
+ * Conducts the data collection of the bot experiments
+ */
 public class ExperimentData
 {
-    // Generate one ship, then perform each bot's simulation on it using the same spawn points 
+
 
 
     private ArrayList<Double> botOneList;
@@ -25,10 +27,15 @@ public class ExperimentData
 
     private ArrayList<Long> botFiveRunTime;
 
-    static final int NUMBER_OF_TESTS = 50;
-
+    //Final Test Value: 
+    static final int NUMBER_OF_TESTS = 10;
+    //Final Test Value: 
     static final int SHIP_LENGTH_FOR_Q_GRAPH = 50;
 
+    /**
+     * Default Constructor
+     * Initializes the array lists
+     */
     public ExperimentData()
     {
         botOneList = new ArrayList<Double>();
@@ -44,10 +51,13 @@ public class ExperimentData
         botFiveRunTime = new ArrayList<Long>();
     }
 
+    /**
+     * Fills the data lists for each bot's success rates.
+     */
     public void fillBotDataLists()
     {
         double qVal = 0.1; 
-        for(int i = 0 ; i < 9; i ++)
+        for(int i = 0 ; i < 10; i ++)
         {
             ArrayList<Integer> botOneResults = new ArrayList<Integer>();
             ArrayList<Integer> botTwoResults = new ArrayList<Integer>();
@@ -75,11 +85,14 @@ public class ExperimentData
             botThreeList.add(getAverageOfIntList(botThreeResults));
             botFourList.add(getAverageOfIntList(botFourResults));
             botFiveList.add(getAverageOfIntList(botFiveResults));
-            System.out.println("q val " + qVal + " completed");
+            //System.out.println("q val " + qVal + " completed");
             qVal += 0.1;
         }
     }
 
+    /**
+     * Fills the run time data lists for each bot.
+     */
     public void fillRunTimes()
     {
         long botOneTotalRunTime = 0;
@@ -139,31 +152,15 @@ public class ExperimentData
             botThreeRunTime.add(botThreeTotalRunTime / NUMBER_OF_TESTS);
             botFourRunTime.add(botFourTotalRunTime / NUMBER_OF_TESTS);
             botFiveRunTime.add(botFiveTotalRunTime / NUMBER_OF_TESTS);
-            System.out.println("Ship Edge Length: " + shipEdgeLength + " Completed");
+            //System.out.println("Ship Edge Length: " + shipEdgeLength + " Completed");
         }
-
-        /* 
-
-        for(int shipEdgeLength = 25; shipEdgeLength <= 150; shipEdgeLength +=25)
-        {
-            //Bot Three
-            long startTime = System.currentTimeMillis();
-            for(int test = 0; test < NUMBER_OF_TESTS; test++)
-            {
-                ExperimentController botThreeExperimentController = new ExperimentController(0.5, shipEdgeLength);
-                botThreeExperimentController.spawn();
-                botThreeExperimentController.botThreeExperiment();
-            }
-            long endTime = System.currentTimeMillis();
-
-            botThreeRunTime.add((endTime-startTime) / NUMBER_OF_TESTS);   
-        }
-        */
-
     }
 
 
-
+    /**
+     * Prints the success rate data for all bots.
+     * Used For Testing
+     */
     public void printAllBotDataLists()
     {
 
@@ -190,6 +187,10 @@ public class ExperimentData
         this.printBotSet(this.getBotFourList());
     }
 
+    /**
+     * Prints the run time data for all bots.
+     * Used For Testing
+     */
     public void printAllBotRunTimes()
     {
          System.out.println(" Bot One Run Time : " + "milliseconds");
@@ -223,6 +224,11 @@ public class ExperimentData
 
     }
 
+    /**
+     * Calculates the average of a list of integers.
+     * @param list The list of integers 
+     * @return The average of the integers in the list.
+     */
     public double getAverageOfIntList(ArrayList<Integer> list)
     {
         int sum = 0;
@@ -243,6 +249,10 @@ public class ExperimentData
         }
     }
 
+    /**
+     * Prints success rate data for a specific bot.
+     * @param list The list of success rates for the bot.
+     */
     public void printBotSet(ArrayList<Double> list)
     {
         
@@ -255,6 +265,10 @@ public class ExperimentData
         }
     }
 
+    /**
+     * Prints run time data for a specific bot.
+     * @param list The list of run times for the bot.
+     */
     public void printBotRunTime(ArrayList<Long> list)
     {
         int index = 0;
@@ -318,25 +332,21 @@ public class ExperimentData
     }
     
 
+    /**
+     * Testbed, Shows an example output of the bot succes rate and run time collection
+     * Configure constants controlling number of tests and ship length to increase speed
+     * @param args
+     * @throws Exception
+     */
     public static void main(String[] args) throws Exception 
     {
-        /* 
-        long startTime = System.currentTimeMillis();
-
-        ExperimentData playBall = new ExperimentData();
-
-        playBall.fillBotDataLists();
-
-        playBall.printAllBotDataLists();
+        ExperimentData test = new ExperimentData();
+        test.fillBotDataLists();
+        test.printAllBotDataLists();
+        test.fillRunTimes();
+        test.printAllBotRunTimes();
 
 
-        long endTime = System.currentTimeMillis();
-        System.out.println("Execution time: " + (endTime - startTime) + " milliseconds");
-        */
-
-        ExperimentData runTimeTest = new ExperimentData();
-        runTimeTest.fillRunTimes();
-        runTimeTest.printAllBotRunTimes();
         
     }
 

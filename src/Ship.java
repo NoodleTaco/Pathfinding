@@ -1,5 +1,10 @@
 import java.util.Random;
 import java.util.ArrayList;
+/**
+ * Defines the Ship where the simulation takes place
+ * An instance of this method defines one ship 
+ * The ship is a square matrix where each of its entries is a Tile 
+ */
 public class Ship {
 
     private Tile[][] ship;
@@ -7,6 +12,9 @@ public class Ship {
     private ArrayList<Tile> neighbors;
     private ArrayList<Tile> deadEnds;
 
+    /**
+     * Default constructor for a Ship with a ship edge length of 50.
+     */    
     public Ship()
     {
         this.shipEdgeLength = 50;
@@ -15,6 +23,10 @@ public class Ship {
         deadEnds = new ArrayList<Tile>();
     }
 
+    /**
+     * Constructor for a Ship with a custom ship edge length.
+     * @param shipEdgeLength The edge length of the ship.
+     */
     public Ship(int shipEdgeLength)
     {
         this.shipEdgeLength = shipEdgeLength;
@@ -25,7 +37,11 @@ public class Ship {
 
 
 
-    
+    /**
+     * Generates the ship by setting tiles as open or closed
+     * This method generates a randomized ship layout.
+     */
+
     public void formShip()
     {
         for(int row = 0; row < shipEdgeLength; row++)
@@ -61,6 +77,10 @@ public class Ship {
 
         
     }
+    /**
+     * Checks if a tile has more than one open neighbor and changes its property if it does. 
+     * @param tile The Tile for which neighbors need to be checked.
+     */
 
     private void checkNeighbors(Tile tile)
     {
@@ -121,7 +141,15 @@ public class Ship {
 
 
     
-    //Prints a visual representation of the ship, used for testing. 
+    /**
+     * Prints a visual representation of the ship, used for testing.
+     * Different colors are used to represent different tile states.
+     * Yellow indicates an open tile that is a dead end
+     * White indicates an open tile
+     * Green indicates a closed tile that has too many neighbors to be opened
+     * Purple indicates that the tile is neighboring an open square: Not seen in the final stage of the ship
+     * Red indicates a closed tile 
+     */ 
     private void printShip()
     {
 
@@ -168,6 +196,9 @@ public class Ship {
         }
     }
 
+    /**
+     * Prints the list of neighboring tiles for debugging purposes.
+     */
     private void printNeighborsList()
     {
         for(int i = 0; i < neighbors.size(); i++)
@@ -178,6 +209,9 @@ public class Ship {
         
     }
 
+    /**
+     * Prints the list of dead-end tiles for debugging purposes.
+     */
     private void printDeadEndsList()
     {
         //System.out.println("Number of Dead ends: " + deadEnds.size());
@@ -188,6 +222,9 @@ public class Ship {
         }
     }
 
+    /**
+     * Identifies and marks dead-end tiles in the ship.
+     */
     private void findDeadEnds()
     {
         for(int row = 0; row < shipEdgeLength; row++)
@@ -201,6 +238,11 @@ public class Ship {
 
     }
 
+    /**
+     * Checks if a specific tile is a dead-end and updates its status.
+     * @param row The row index of the tile.
+     * @param col The column index of the tile.
+     */
     private void isDeadEnd(int row, int col)
     {
         if((row < shipEdgeLength && row > -1 && col < shipEdgeLength && col > -1))
@@ -251,15 +293,18 @@ public class Ship {
 
     }
 
+    /**
+     * Opens approximetly half of the dead ends in the ship
+     */
     private void createDeadEnds()
     {
         findDeadEnds();
 
         int startingDeadEnds = deadEnds.size();
-        //System.out.println("Number of Starting Dead ends: " + startingDeadEnds);
+
         Random rand = new Random();
         
-        //for(int i = 0; i < 1; i++)
+
         while(deadEnds.size() > startingDeadEnds/2)
         {
             Tile tile = deadEnds.get(rand.nextInt(deadEnds.size()));
@@ -293,17 +338,26 @@ public class Ship {
             isDeadEnd( deadEndNeighbors.get(randTile).getRow() -1 , deadEndNeighbors.get(randTile).getCol());
             isDeadEnd( deadEndNeighbors.get(randTile).getRow() , deadEndNeighbors.get(randTile).getCol() -1);
             isDeadEnd( deadEndNeighbors.get(randTile).getRow() , deadEndNeighbors.get(randTile).getCol() +1);
-            //System.out.println("Tile Coords are "+ tile.getRow() + ", " + tile.getCol());
-            //System.out.println ("deadEndNeighbors size: " + deadEndNeighbors.size());
+
         }
     }
 
 
+    /**
+     * Returns the edge length of the ship.
+     * @return The edge length of the ship.
+     */
     public int getShipEdgeLength()
     {
         return shipEdgeLength;
     }
 
+    /**
+     * Returns a Tile object from the ship grid at the specified row and column.
+     * @param row The row index of the Tile.
+     * @param col The column index of the Tile.
+     * @return The Tile object at the specified coordinates.
+     */
     public Tile getShipTile(int row, int col)
     {
         return ship[row][col];
@@ -313,7 +367,12 @@ public class Ship {
 
     
 
-    //testbed Main
+    /**
+     * Main method for testing the Ship class.
+     * 
+     * @param args 
+     * @throws Exception
+     */
     public static void main(String[] args) throws Exception 
     {
         Ship ship = new Ship();

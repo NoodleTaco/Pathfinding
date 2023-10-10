@@ -4,13 +4,16 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Map;
-import java.util.PriorityQueue;
 import java.util.Queue;
 import java.util.Random;
 import java.util.Set;
 import java.util.Iterator;
 import java.lang.Math;
 
+/**
+ * Represents one testing environment
+ * An instance of this class holds a randomly generated ship and spawn locations of the experiment variables
+ */
 public class ExperimentController {
 
     private Ship ship;
@@ -32,6 +35,10 @@ public class ExperimentController {
 
     private double q;
 
+    /**
+     * Constructs an ExperimentController with a given q value.
+     * @param q The q value used in the experiment.
+     */
     public ExperimentController(double q)
     {
         ship = new Ship();
@@ -40,6 +47,11 @@ public class ExperimentController {
         this.q = q;
     }
 
+    /**
+     * Constructs an ExperimentController with a given q value and ship edge length.
+     * @param q The q value used in the experiment.
+     * @param shipEdgeLength The edge length of the ship to be generated.
+     */
     public ExperimentController(double q, int shipEdgeLength)
     {
         ship = new Ship(shipEdgeLength);
@@ -100,8 +112,8 @@ public class ExperimentController {
     }
     
     /**
-     * Creates the botPath for bot one
-     * Uses a single run of bfs 
+     * Generates the bot path avoiding any tiles on fire
+     * BFS algorithim 
      */
     public void bfsAvoidFire()
     {
@@ -123,7 +135,6 @@ public class ExperimentController {
 
             if(curr.equals(button))
             {
-                //System.out.println("Found it");
                 break;
             }
 
@@ -162,21 +173,14 @@ public class ExperimentController {
 
         botPath.remove(0);
 
-        /* 
-        System.out.println("Bot Path Size: " + botPath.size());
-
-        System.out.print("Bot Path: ");
-
-        for(Tile tile: botPath)
-        {
-            System.out.print(tile.toString() + " ");
-        }
-        */
-
-        //System.out.println();
-
     }
 
+    /**
+     * Calculates the distance from a tile to the button
+     * BFS algorithim 
+     * @param startTile The starting tile for the calculation.
+     * @return The distance from the startTile to the button.
+     */
     public int distToButton(Tile startTile)
     {
         Queue<Tile> queue = new LinkedList<>();
@@ -195,7 +199,6 @@ public class ExperimentController {
 
             if(curr.equals(button))
             {
-                //System.out.println("Found it");
                 break;
             }
 
@@ -225,26 +228,14 @@ public class ExperimentController {
             currentTile = parent.get(currentTile);
         }
 
-        
-
         return count;
-
-        /* 
-        System.out.println("Bot Path Size: " + botPath.size());
-
-        System.out.print("Bot Path: ");
-
-        for(Tile tile: botPath)
-        {
-            System.out.print(tile.toString() + " ");
-        }
-        */
-
-        //System.out.println();
     }
 
     
-
+    /**
+     * Generates the bot path avoiding any tiles on fire or adjacent to fire tiles
+     * BFS algorithim 
+     */
     public void bfsAvoidFireNeighbor()
     {
         Queue<Tile> queue = new LinkedList<>();
@@ -273,7 +264,6 @@ public class ExperimentController {
 
             if(curr.equals(button))
             {
-                //System.out.println("Found it");
                 break;
             }
 
@@ -312,21 +302,12 @@ public class ExperimentController {
         Collections.reverse(botPath);
 
         botPath.remove(0);
-        /* 
-
-        System.out.println("Bot Path Size: " + botPath.size());
-
-        System.out.print("Bot Path: ");
-
-        for(Tile tile: botPath)
-        {
-            System.out.print(tile.toString() + " ");
-        }
-
-        System.out.println();
-        */
     }
 
+    /**
+     * Generates the bot path avoiding any tiles on fire or adjacent to fire tiles
+     * A* algorithim
+     */
     private void aStarAvoidFireNeighbors()
     {
         TilePriorityQueue fringe = new TilePriorityQueue();
@@ -405,7 +386,10 @@ public class ExperimentController {
 
 
     
-
+    /**
+     * Generates the bot path avoiding any tiles on fire
+     * BFS algorithim 
+     */
     private void aStarAvoidFire()
     {
         TilePriorityQueue fringe = new TilePriorityQueue();
@@ -477,15 +461,21 @@ public class ExperimentController {
 
     
 
+    /**
+     * Heuristic function for the A* algorithm.
+     * @param tile The tile for which to calculate the heuristic value.
+     * @return The heuristic value for the tile.
+     */
     private int h(Tile tile)
     {
         return Math.abs(tile.getRow() - button.getRow()) + Math.abs(tile.getCol() - button.getCol());
     }
 
+
     /**
      * Adds open tiles adjacent to a select tile to a list
-     * @param tile the tile whose neighbors are being considered
-     * @param list the list where tile objects are being added 
+     * @param tile The tile whose neighbors are being considered
+     * @param list The list where tile objects are being added 
      */
     private void fillNeighborsList(Tile tile, ArrayList<Tile> list)
     {
@@ -511,6 +501,11 @@ public class ExperimentController {
         
     }
 
+    /**
+     * Adds open tiles adjacent to a select tile to a set
+     * @param tile The tile whose neighbors are being considered
+     * @param set The set where tile objects are being added 
+     */
     private void fillNeighborsSet(Tile tile, Set<Tile> set)
     {
         if(tile.getRow() + 1 < ship.getShipEdgeLength() && ship.getShipTile(tile.getRow() + 1, tile.getCol()).getOpen()) 
@@ -535,6 +530,10 @@ public class ExperimentController {
     }
 
 
+    /**
+     * Conducts one run of the experiment with Bot One 
+     * @return The result of the bot one experiment (1 for success, 0 for failure).
+     */
     public int botOneExperiment()
     {
         //System.out.println("**Bot 1 Experiment**");
@@ -551,7 +550,7 @@ public class ExperimentController {
         {
             if(fireTiles.contains(bot))
             {
-                //System.out.println("death");
+                //System.out.println("destruction");
                 return 0;
             }
 
@@ -565,7 +564,7 @@ public class ExperimentController {
 
             if(fireTiles.contains(bot))
             {
-                //System.out.println("death");
+                //System.out.println("destruction");
                 return 0;
             }
 
@@ -579,6 +578,10 @@ public class ExperimentController {
         }
     }
 
+    /**
+     * Conducts one run of the experiment with Bot Two 
+     * @return The result of the bot one experiment (1 for success, 0 for failure).
+     */
     public int botTwoExperiment()
     {
         //System.out.println("**Bot 2 Experiment**");
@@ -595,7 +598,7 @@ public class ExperimentController {
             
             if(fireTiles.contains(bot))
             {
-                //System.out.println("death");
+                //System.out.println("destruction");
                 return 0;
             }
 
@@ -609,7 +612,7 @@ public class ExperimentController {
 
             if(fireTiles.contains(bot))
             {
-                //System.out.println("death");
+                //System.out.println("destruction");
                 return 0;
             }
 
@@ -622,6 +625,10 @@ public class ExperimentController {
         }
     }
 
+    /**
+     * Conducts one run of the experiment with Bot Three 
+     * @return The result of the bot one experiment (1 for success, 0 for failure).
+     */
     public int botThreeExperiment()
     {
         //System.out.println("**Bot 3 Experiment**");
@@ -639,7 +646,7 @@ public class ExperimentController {
             
             if(fireTiles.contains(bot))
             {
-                //System.out.println("death");
+                //System.out.println("destruction");
                 return 0;
             }
 
@@ -653,7 +660,7 @@ public class ExperimentController {
 
             if(fireTiles.contains(bot))
             {
-                //System.out.println("death");
+                //System.out.println("destruction");
                 return 0;
             }
 
@@ -666,6 +673,10 @@ public class ExperimentController {
         }
     }
 
+    /**
+     * Conducts one run of the experiment with Bot Four 
+     * @return The result of the bot one experiment (1 for success, 0 for failure).
+     */
     public int botFourExperiment()
     {
         //System.out.println("**Bot 4 Experiment**");
@@ -683,7 +694,7 @@ public class ExperimentController {
             
             if(fireTiles.contains(bot))
             {
-                //System.out.println("death");
+                //System.out.println("destruction");
                 return 0;
             }
 
@@ -697,7 +708,7 @@ public class ExperimentController {
 
             if(fireTiles.contains(bot))
             {
-                //System.out.println("death");
+                //System.out.println("destruction");
                 return 0;
             }
 
@@ -709,7 +720,11 @@ public class ExperimentController {
 
         }
     }
-
+    
+    /**
+     * Conducts one run of the experiment with Bot Five 
+     * @return The result of the bot one experiment (1 for success, 0 for failure).
+     */
     public int botFiveExperiment()
     {
         if(isBotCloser())
@@ -730,7 +745,7 @@ public class ExperimentController {
                 
                 if(fireTiles.contains(bot))
                 {
-                    //System.out.println("death");
+                    //System.out.println("destruction");
                     return 0;
                 }
 
@@ -744,7 +759,7 @@ public class ExperimentController {
 
                 if(fireTiles.contains(bot))
                 {
-                    //System.out.println("death");
+                    //System.out.println("destruction");
                     return 0;
                 }
 
@@ -758,12 +773,19 @@ public class ExperimentController {
         }
     }
 
+    /**
+     * Checks if botStartTile is closer to the button than fireStartTile.
+     * @return true if botStartTile is closer, false otherwise.
+     */
     private boolean isBotCloser()
     {
         return distToButton(botStartTile) <= distToButton(fireStartTile);
     }
 
 
+    /**
+     * Progresses the spread of the fire by one time tick 
+     */
     private void fireSpread()
     {
         ArrayList<Tile> fireNeighbors = new ArrayList<Tile>();
@@ -833,6 +855,11 @@ public class ExperimentController {
         return count;
     }
 
+    /**
+     * Performs a probability roll based on the given probability.
+     * @param probability The probability of success.
+     * @return true if the roll is successful, false otherwise.
+     */
     public boolean probabilityRoll(double probability)
     {
         Random rand = new Random();
@@ -840,7 +867,15 @@ public class ExperimentController {
         return randomValue < probability;
     }
 
-    //Prints a visual representation of the ship, used for testing. 
+    /**
+     * Prints a visual representation of the ship for testing purposes.
+     * Orange (looks yellow to me) indicates a tile on fire
+     * Blue represents the bot
+     * Purple represents the button
+     * Red Represents the path the bot has traced out to reach the button
+     * White represents a plain open tile
+     * Green represents a closed tile
+     */
     private void printShip()
     {
         String reset = "\u001B[0m";
@@ -891,6 +926,9 @@ public class ExperimentController {
         }
     }
 
+    /**
+     * Resets the bot, fire, and button to their starting positions
+     */
     public void resetSpawn()
     {
         bot = botStartTile;
@@ -900,23 +938,74 @@ public class ExperimentController {
         botPath.clear();
     }
 
-
-
+    /**
+     * Returns the ship object 
+     * @return The ship object.
+     */
     public Ship getShip()
     {
         return ship;
     }
 
+    /**
+     * Runs the bot three experiment with the print functions
+     * Used in testing to visually trace the algorithim 
+     */
+    public void botThreeExperimentDemonstration()
+    {
+        System.out.println("**Bot 3 Experiment**");
+        printShip();
+
+        while(true)
+        {
+            bfsAvoidFireNeighbor();
+
+            if(botPath.isEmpty())
+            {
+                System.out.println("Button Unreachable");
+                return;
+            }
+            
+            if(fireTiles.contains(bot))
+            {
+                System.out.println("destruction");
+                return;
+            }
+
+            bot = botPath.remove(0);
+
+            if(bot.equals(button))
+            {
+                System.out.println("YIPPPEEEE");
+                return;
+            }
+
+            if(fireTiles.contains(bot))
+            {
+                System.out.println("destruction");
+                return;
+            }
+
+            fireSpread();
+
+            System.out.println();
+
+            printShip();
+
+        }
+    }
+
     
-    
+     /**
+     * Testbed, Shows a visual demonstraiton of bot three's run
+     * @param args 
+     * @throws Exception 
+     */
     public static void main(String[] args) throws Exception 
     {
-        long startTime = System.currentTimeMillis();
         ExperimentController experimentController = new ExperimentController(0.5, 25);
         experimentController.spawn();
-        System.out.println (experimentController.botFiveExperiment()); 
-        long endTime = System.currentTimeMillis();
-        System.out.println("Execution time: " + (endTime - startTime) + " milliseconds");
+        experimentController.botThreeExperimentDemonstration();
 
 
     }
