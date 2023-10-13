@@ -24,7 +24,7 @@ public class DataDriver {
 
         ArrayList<Double> qVals = new ArrayList<Double>();
 
-        qVals.add(0.1); qVals.add(0.2); qVals.add(0.3); qVals.add(0.4); qVals.add(0.5); qVals.add(0.6); qVals.add(0.7); qVals.add(0.8); qVals.add(0.9); qVals.add(1.0); 
+        qVals.add(0.0); qVals.add(0.1); qVals.add(0.2); qVals.add(0.3); qVals.add(0.4); qVals.add(0.5); qVals.add(0.6); qVals.add(0.7); qVals.add(0.8); qVals.add(0.9); qVals.add(1.0); 
 
         ArrayList<Integer> shipEdgeLengths = new ArrayList<Integer>();
 

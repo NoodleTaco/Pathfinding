@@ -1,11 +1,13 @@
-## Ship Design
+## Running Graph
+The graph runs on x chart 3.8.5 
+Running the main method in data driver will generate the bot's graphs. 
+The number of tests and sizes of the ship can be altered by changing the constants in ExperimentData
 
-The ship is an n x n matrix of open and closed tiles. 
-The path is randomly generated with the constraint that a closed tile can be opened only if it has 1 open neighbor. 
-At the end of the generation, half of the deadends are opened at random. 
+## Testing Notes
+Testbed Main in the Ship, ExperimentController, and ExperimentData class demonstrate a small scale test of the class. 
 
-## Experiment Design
-A bot, a fire, and a button are spawned randomly around the ship. 
-At each time step, the bot moves towards the button in accordance to one of its pathfinding algorithims and the fire spreads. 
-If the robot reaches the button, the experiment is a success. If the bot is inside of a fire tile, the experiment fails. 
-The rate at which the fire is spread can be controlled. 
+Ship prints a color coded layout of the ship. 
+
+ExperimentController shows a step by step run of bot 3 
+
+ExperimentData prints the average successrate and runtime of a number of bot runs

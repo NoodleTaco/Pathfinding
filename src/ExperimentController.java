@@ -10,6 +10,8 @@ import java.util.Set;
 import java.util.Iterator;
 import java.lang.Math;
 
+
+
 /**
  * Represents one testing environment
  * An instance of this class holds a randomly generated ship and spawn locations of the experiment variables
@@ -306,7 +308,7 @@ public class ExperimentController {
 
     /**
      * Generates the bot path avoiding any tiles on fire or adjacent to fire tiles
-     * A* algorithim
+     * A* algorithim using manhattan distance from the button as the heuristic function
      */
     private void aStarAvoidFireNeighbors()
     {
@@ -318,7 +320,7 @@ public class ExperimentController {
 
         botPath.clear();
 
-        fringe.add(bot, h(bot));
+        fringe.add(bot, manhattanDistance(bot , button));
         distTo.put(bot, 0);
         parent.put(bot, null);
 
@@ -349,14 +351,14 @@ public class ExperimentController {
                         {
                             distTo.put(tile, tempDist);
                             parent.put(tile, curr);
-                            fringe.add(tile, distTo.get(tile)  + h(tile));
+                            fringe.add(tile, distTo.get(tile)  + manhattanDistance(tile , button));
                         }
                     }
                     else
                     {
                         distTo.put(tile, tempDist);
                         parent.put(tile, curr);
-                        fringe.add(tile, distTo.get(tile)  + h(tile));
+                        fringe.add(tile, distTo.get(tile)  + manhattanDistance(tile , button));
                     }
                 }
                 
@@ -388,7 +390,7 @@ public class ExperimentController {
     
     /**
      * Generates the bot path avoiding any tiles on fire
-     * BFS algorithim 
+     * A* algorithim using manhattan distance from the button as the heuristic function
      */
     private void aStarAvoidFire()
     {
@@ -399,7 +401,7 @@ public class ExperimentController {
 
         botPath.clear();
 
-        fringe.add(bot, h(bot));
+        fringe.add(bot, manhattanDistance(bot , button));
         distTo.put(bot, 0);
         parent.put(bot, null);
 
@@ -425,14 +427,14 @@ public class ExperimentController {
                         {
                             distTo.put(tile, tempDist);
                             parent.put(tile, curr);
-                            fringe.add(tile, distTo.get(tile)  + h(tile));
+                            fringe.add(tile, distTo.get(tile)  + manhattanDistance(tile , button));
                         }
                     }
                     else
                     {
                         distTo.put(tile, tempDist);
                         parent.put(tile, curr);
-                        fringe.add(tile, distTo.get(tile)  + h(tile));
+                        fringe.add(tile, distTo.get(tile)  + manhattanDistance(tile , button));
                     }
                 }
                 
@@ -459,18 +461,138 @@ public class ExperimentController {
 
     }
 
-    
-
     /**
-     * Heuristic function for the A* algorithm.
-     * @param tile The tile for which to calculate the heuristic value.
-     * @return The heuristic value for the tile.
+     * Generates the bot path considering how far a given tile is from the button weighed against its proximity to fire
+     * A* algorithim using the heuristic of proximity to button - proximity to fire tiles
      */
-    private int h(Tile tile)
+    private void aStarBotFive(double weight)
     {
-        return Math.abs(tile.getRow() - button.getRow()) + Math.abs(tile.getCol() - button.getCol());
+        TilePriorityQueue fringe = new TilePriorityQueue();
+        Map<Tile, Integer> distTo = new HashMap<>();
+        Map<Tile, Tile> parent = new HashMap<>();
+        Set<Tile> botNeighbors = new HashSet<Tile>();
+
+        botPath.clear();
+
+        fringe.add(bot, botFireDistanceHeuristic(bot, weight));
+        distTo.put(bot, 0);
+        parent.put(bot, null);
+
+        while(!fringe.isEmpty())
+        {
+            Tile curr = fringe.poll();
+            if(curr.equals(button))
+            {
+                break;
+            }
+
+            fillNeighborsSet(curr, botNeighbors);
+
+            for(Tile tile : botNeighbors)
+            {
+                if(!fireTiles.contains(tile))
+                {
+                    int tempDist = distTo.get(curr) + 1;
+
+                    if(distTo.containsKey(tile))
+                    {
+                        if(distTo.get(tile) > tempDist)
+                        {
+                            distTo.put(tile, tempDist);
+                            parent.put(tile, curr);
+                            fringe.add(tile, distTo.get(tile)  + botFireDistanceHeuristic(tile, weight));
+                        }
+                    }
+                    else
+                    {
+                        distTo.put(tile, tempDist);
+                        parent.put(tile, curr);
+                        fringe.add(tile, distTo.get(tile)  + botFireDistanceHeuristic(tile, weight));
+                    }
+                }
+                
+            }
+            botNeighbors.clear();
+        }
+        if(!parent.containsKey(button))
+        {
+            return;
+        }
+        
+        Tile currentTile = button;
+
+        while(currentTile != null)
+        {
+
+            botPath.add(currentTile);
+            currentTile = parent.get(currentTile);
+        }
+
+        Collections.reverse(botPath);
+
+        botPath.remove(0);
+
     }
 
+
+
+    /**
+     * A Heuristic that weighs a tile depending on its proximity to the nearest fire tile and the button
+     * 
+     * @param tile The tile whose priority is being calculated
+     * @return The prioirty of the tile based on the heuristic
+     */
+    private int botFireDistanceHeuristic(Tile tile, double weight)
+    {
+        Tile closeFireTile = closeFireTile(tile);
+
+    
+        return manhattanDistance(tile, button) - (int)(weight * manhattanDistance(tile, closeFireTile));
+    }
+
+    /**
+     * Performs a local search for the fire tile closest to a given tile
+     * @param tile The tile whose distance to the approximately closest fire tile is being conisdered
+     * @return Approximetly the closest fire tile
+     */
+    private Tile closeFireTile(Tile tile)
+    {
+        Tile start = fireStartTile;
+
+        ArrayList<Tile> fireNeighbors = new ArrayList<Tile>();
+
+        while(true)
+        {
+            Tile tracker = start;
+
+            fillNeighborsList(start, fireNeighbors);
+
+            for(Tile pointer: fireNeighbors)
+            {
+                if(fireTiles.contains(pointer) && manhattanDistance(pointer, tile) < manhattanDistance(start, tile))
+                {
+                    start = pointer;
+                }
+            }
+
+            if(start.equals(tracker))
+            {
+                return start;
+            }
+
+        }
+    }
+
+    /**
+     * Returns the manhattan distance from a given tile to another
+     * @param tileOne The first tile considered
+     * @param tileTwo The second tile considered
+     * @return The manhattan distance between the two tiles being considered
+     */
+    private int manhattanDistance(Tile tileOne, Tile tileTwo)
+    {
+        return Math.abs(tileTwo.getRow() - tileOne.getRow()) + Math.abs(tileTwo.getCol() - tileOne.getCol());
+    }
 
     /**
      * Adds open tiles adjacent to a select tile to a list
@@ -679,54 +801,6 @@ public class ExperimentController {
      */
     public int botFourExperiment()
     {
-        //System.out.println("**Bot 4 Experiment**");
-        //printShip();
-
-        while(true)
-        {
-            aStarAvoidFireNeighbors();
-
-            if(botPath.isEmpty())
-            {
-                //System.out.println("Button Unreachable");
-                return 0;
-            }
-            
-            if(fireTiles.contains(bot))
-            {
-                //System.out.println("destruction");
-                return 0;
-            }
-
-            bot = botPath.remove(0);
-
-            if(bot.equals(button))
-            {
-                //System.out.println("YIPPPEEEE");
-                return 1;
-            }
-
-            if(fireTiles.contains(bot))
-            {
-                //System.out.println("destruction");
-                return 0;
-            }
-
-            fireSpread();
-
-            //System.out.println();
-
-            //printShip();
-
-        }
-    }
-    
-    /**
-     * Conducts one run of the experiment with Bot Five 
-     * @return The result of the bot one experiment (1 for success, 0 for failure).
-     */
-    public int botFiveExperiment()
-    {
         if(isBotCloser())
         {
             return 1;
@@ -772,6 +846,54 @@ public class ExperimentController {
             }
         }
     }
+    
+    /**
+     * Conducts one run of the experiment with Bot Five 
+     * @return The result of the bot one experiment (1 for success, 0 for failure).
+     */
+    public int botFiveExperiment(double weight)
+    {
+
+
+        while(true)
+        {
+            aStarBotFive(weight);
+
+            if(botPath.isEmpty())
+            {
+                //System.out.println("Button Unreachable");
+                return 0;
+            }
+            
+            if(fireTiles.contains(bot))
+            {
+                //System.out.println("destruction");
+                return 0;
+            }
+
+            bot = botPath.remove(0);
+
+            if(bot.equals(button))
+            {
+                //System.out.println("YIPPPEEEE");
+                return 1;
+            }
+
+            if(fireTiles.contains(bot))
+            {
+                //System.out.println("destruction");
+                return 0;
+            }
+
+            fireSpread();
+
+            //System.out.println();
+
+            //printShip();
+
+        }
+        
+    }
 
     /**
      * Checks if botStartTile is closer to the button than fireStartTile.
@@ -779,7 +901,7 @@ public class ExperimentController {
      */
     private boolean isBotCloser()
     {
-        return distToButton(botStartTile) <= distToButton(fireStartTile);
+        return distToButton(botStartTile) < distToButton(fireStartTile);
     }
 
 
@@ -995,6 +1117,7 @@ public class ExperimentController {
         }
     }
 
+
     
      /**
      * Testbed, Shows a visual demonstraiton of bot three's run
@@ -1003,9 +1126,12 @@ public class ExperimentController {
      */
     public static void main(String[] args) throws Exception 
     {
-        ExperimentController experimentController = new ExperimentController(0.5, 25);
+        ExperimentController experimentController = new ExperimentController(0.8, 25);
         experimentController.spawn();
         experimentController.botThreeExperimentDemonstration();
+
+
+        
 
 
     }
